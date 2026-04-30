@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+
+<head>
+  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Studio Modèles — Inscription</title>
+
+  <!-- Polices Google Fonts chargées depuis internet -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <header>
+    <div class="logo">Studio<span>Modèles</span></div>
+    <div class="header-badge">Inscription — 2025</div>
+  </header>
+
+  <div class="hero">
+    <p class="hero-label">✦ Lumina ✦</p>
+    <h1>Rejoignez notre<br /><em>Book de Modèles</em></h1>
+    <p>Remplissez ce formulaire avec soin. </p>
+  </div>
+
+  <main>
+
+    <form id="modelForm" novalidate>
+
+      <!-- ════════════════════════════════════════
+           SECTION 01 — PHOTOS
+      ════════════════════════════════════════ -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-num">01</span>
+          <h2 class="section-title">Photos</h2>
+        </div>
+
+        <div class="uploads-grid">
+
+          <div class="upload-group">
+            <label>Photo de profil <span class="required">*</span></label>
+            <div class="upload-zone" id="zoneProfil">
+              <input type="file" id="photoProfil" name="photoProfil" accept="image/*" />
+              <div class="upload-placeholder">
+                <div class="upload-icon">🤳</div>
+                <div class="upload-label-main">Photo de profil</div>
+                <div class="upload-label-sub">Visage clair · Fond neutre</div>
+              </div>
+              <img class="upload-preview" id="previewProfil" src="" alt="Aperçu profil" />
+            </div>
+            <span class="field-error" id="profilError">Une photo de profil est requise.</span>
+          </div>
+
+          <div class="upload-group">
+            <label>Photo full body <span class="required">*</span></label>
+            <div class="upload-zone" id="zoneBody">
+              <input type="file" id="photoBody" name="photoBody" accept="image/*" />
+              <div class="upload-placeholder">
+                <div class="upload-icon">🧍</div>
+                <div class="upload-label-main">Photo en pied</div>
+                <div class="upload-label-sub">Corps entier · Tenue simple</div>
+              </div>
+              <img class="upload-preview" id="previewBody" src="" alt="Aperçu full body" />
+            </div>
+            <span class="field-error" id="bodyError">Une photo en pied est requise.</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           SECTION 02 — INFORMATIONS PERSONNELLES
+      ════════════════════════════════════════ -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-num">02</span>
+          <h2 class="section-title">Informations personnelles</h2>
+        </div>
+
+        <div class="form-grid">
+
+          
+          <div class="field-group">
+            <label for="prenom">Prénom <span class="required">*</span></label>
+            <input type="text" id="prenom" name="prenom" placeholder="Camille" autocomplete="given-name" />
+            <span class="field-error" id="prenomError">Le prénom est requis.</span>
+          </div>
+
+          <div class="field-group">
+            <label for="nom">Nom <span class="required">*</span></label>
+            <input type="text" id="nom" name="nom" placeholder="Dupont" autocomplete="family-name" />
+            <span class="field-error" id="nomError">Le nom est requis.</span>
+          </div>
+
+          <!-- type="email" active le clavier @ sur mobile -->
+          <div class="field-group">
+            <label for="email">Adresse email <span class="required">*</span></label>
+            <input type="email" id="email" name="email" placeholder="camille@exemple.com" autocomplete="email" />
+            <span class="field-error" id="emailError">Veuillez entrer un email valide.</span>
+          </div>
+
+          <!-- type="tel" active le pavé numérique sur mobile -->
+          <div class="field-group">
+            <label for="telephone">Téléphone <span class="required">*</span></label>
+            <input type="tel" id="telephone" name="telephone" placeholder="+1 514 000 0000" autocomplete="tel" />
+            <span class="field-error" id="telephoneError">Un numéro de téléphone est requis.</span>
+          </div>
+
+          <div class="field-group full-width">
+            <label>Genre <span class="required">*</span></label>
+            <div class="size-selector">
+              <label class="size-btn"><input type="radio" name="genre" value="Femme" /><span>Femme</span></label>
+              <label class="size-btn"><input type="radio" name="genre" value="Homme" /><span>Homme</span></label>
+            </div>
+            <span class="field-error" id="genreError">Veuillez sélectionner un genre.</span>
+          </div>
+
+          <div class="field-group">
+            <label for="instagram">Instagram</label>
+            <input type="text" id="instagram" name="instagram" placeholder="@votre_pseudo" />
+          </div>
+
+          <div class="field-group">
+            <label for="taille">Taille <span class="required">*</span></label>
+            <div class="input-with-unit">
+              <input type="number" id="taille" name="taille" placeholder="175" min="140" max="220" />
+              <span class="unit">cm</span>
+            </div>
+            <span class="field-error" id="tailleError">Taille requise (140–220 cm).</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           SECTION 03 — MENSURATIONS
+      ════════════════════════════════════════ -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-num">03</span>
+          <h2 class="section-title">Mensurations</h2>
+        </div>
+
+        <div class="form-grid">
+
+          
+          <div class="field-group">
+            <label for="poitrine">Tour de poitrine</label>
+            <div class="input-with-unit">
+              <input type="number" id="poitrine" name="poitrine" placeholder="86" min="60" max="140" />
+              <span class="unit">cm</span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="tourTaille">Tour de taille</label>
+            <div class="input-with-unit">
+              <input type="number" id="tourTaille" name="tourTaille" placeholder="62" min="50" max="130" />
+              <span class="unit">cm</span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="hanches">Tour de hanches</label>
+            <div class="input-with-unit">
+              <input type="number" id="hanches" name="hanches" placeholder="90" min="60" max="150" />
+              <span class="unit">cm</span>
+            </div>
+          </div>
+
+          
+          <div class="field-group">
+            <label for="pointure">Pointure</label>
+            <div class="input-with-unit">
+              <input type="number" id="pointure" name="pointure" placeholder="39" min="33" max="50" />
+              <span class="unit">EU</span>
+            </div>
+          </div>
+
+          
+          <div class="field-group full-width">
+            <label>Taille haut <span class="required">*</span></label>
+            <div class="size-selector">
+              <label class="size-btn"><input type="radio" name="tailleHaut" value="XS" /><span>XS</span></label>
+              <label class="size-btn"><input type="radio" name="tailleHaut" value="S"  /><span>S</span></label>
+              <label class="size-btn"><input type="radio" name="tailleHaut" value="M"  /><span>M</span></label>
+              <label class="size-btn"><input type="radio" name="tailleHaut" value="L"  /><span>L</span></label>
+              <label class="size-btn"><input type="radio" name="tailleHaut" value="XL" /><span>XL</span></label>
+              <label class="size-btn"><input type="radio" name="tailleHaut" value="XXL"/><span>XXL</span></label>
+            </div>
+            <span class="field-error" id="tailleHautError">Veuillez sélectionner une taille haut.</span>
+          </div>
+
+          <div class="field-group full-width">
+            <label>Taille bas <span class="required">*</span></label>
+            <div class="size-selector">
+              <label class="size-btn"><input type="radio" name="tailleBas" value="XS" /><span>XS</span></label>
+              <label class="size-btn"><input type="radio" name="tailleBas" value="S"  /><span>S</span></label>
+              <label class="size-btn"><input type="radio" name="tailleBas" value="M"  /><span>M</span></label>
+              <label class="size-btn"><input type="radio" name="tailleBas" value="L"  /><span>L</span></label>
+              <label class="size-btn"><input type="radio" name="tailleBas" value="XL" /><span>XL</span></label>
+              <label class="size-btn"><input type="radio" name="tailleBas" value="XXL"/><span>XXL</span></label>
+            </div>
+            <span class="field-error" id="tailleBasError">Veuillez sélectionner une taille bas.</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           SECTION 04 — EXPÉRIENCE & DISPONIBILITÉ
+      ════════════════════════════════════════ -->
+      <div class="form-section">
+        <div class="section-header">
+          <span class="section-num">04</span>
+          <h2 class="section-title">Expérience & disponibilité</h2>
+        </div>
+
+        <div class="form-grid">
+
+        
+          <div class="field-group">
+            <label for="experience">Niveau d'expérience <span class="required">*</span></label>
+            <select id="experience" name="experience">
+              <option value="">— Sélectionner —</option>
+              <option value="debutant">Débutant(e) — Pas d'expérience</option>
+              <option value="intermediaire">Intermédiaire — Quelques shoots</option>
+              <option value="confirme">Confirmé(e) — Book complet</option>
+              <option value="professionnel">Professionnel(le) — Agence / Contrats</option>
+            </select>
+            <span class="field-error" id="experienceError">Veuillez sélectionner votre niveau.</span>
+          </div>
+
+          <div class="field-group">
+            <label for="disponibilite">Disponibilité</label>
+            <select id="disponibilite" name="disponibilite">
+              <option value="">— Sélectionner —</option>
+              <option value="temps-plein">Temps plein</option>
+              <option value="temps-partiel">Temps partiel</option>
+              <option value="weekends">Week-ends uniquement</option>
+              <option value="ponctuellement">Ponctuellement</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- BOUTON D'ENVOI -->
+      <div class="form-footer">
+        <button type="submit" class="btn-submit" id="submitBtn">
+          Envoyer ma candidature
+        </button>
+        <p class="form-note">🔒 Vos données sont confidentielles et réservées à notre agence.</p>
+      </div>
+
+    </form>
+
+    <!-- Affiché après envoi réussi — caché par défaut via CSS -->
+    <div class="success-message" id="successMessage">
+      <div class="success-icon">✦</div>
+      <h2>Candidature reçue !</h2>
+      <p>Notre équipe examinera votre profil et vous contactera sous 7 jours ouvrés.</p>
+    </div>
+
+  </main>
+
+  
+  <script src="script.js"></script>
+
+</body>
+</html>
