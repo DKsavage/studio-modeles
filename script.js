@@ -1,8 +1,18 @@
 'use strict';
 
+
+/* ─────────────────────────────────────────────────────────────
+   📘 CONFIGURATION — URL de l'API Apps Script
+   C'est l'URL obtenue après le déploiement Apps Script.
+   Si un jour tu redéploies, remplace cette URL ici.
+───────────────────────────────────────────────────────────── */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtidDnma9A01bpIc5dn5wmcbi5_CaCXcQXHQhqjumihx0XKlXs6eJ_DyjmU4JNEmjB/exec';
+
+
 const form       = document.getElementById('modelForm');
 const submitBtn  = document.getElementById('submitBtn');
 const successMsg = document.getElementById('successMessage');
+
 
 /**
  * Affiche une erreur sur un champ.
@@ -15,7 +25,7 @@ function showError(inputId, errorId) {
   if (input) input.classList.add('error');
   if (error) error.classList.add('visible');
 }
- 
+
 /**
  * Efface l'erreur sur un champ.
  */
@@ -26,35 +36,52 @@ function clearError(inputId, errorId) {
   if (error) error.classList.remove('visible');
 }
 
+
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+
 function formatInstagramUrl(input) {
-  
   let pseudo = input.trim();
   if (!pseudo) return '';
- 
+
   pseudo = pseudo.replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, '');
- 
+
   if (pseudo.startsWith('@')) {
     pseudo = pseudo.substring(1); /* substring(1) = à partir du 2e caractère */
   }
- 
+
   if (pseudo.endsWith('/')) {
     pseudo = pseudo.slice(0, -1); /* slice(0, -1) = tout sauf le dernier caractère */
   }
 
   if (!pseudo) return '';
- 
+
   return `https://instagram.com/${pseudo}`;
 }
+
+
+/* ─────────────────────────────────────────────────────────────
+   📘 fileToBase64 — convertit une image en chaîne base64
+   Nécessaire pour envoyer la photo dans une requête JSON.
+   On encapsule FileReader dans une Promise pour utiliser await.
+───────────────────────────────────────────────────────────── */
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Erreur de lecture du fichier'));
+    reader.readAsDataURL(file);
+  });
+}
+
 
 function setupUpload(inputId, previewId, zoneId) {
   const input   = document.getElementById(inputId);
   const preview = document.getElementById(previewId);
   const zone    = document.getElementById(zoneId);
- 
+
   /*
     Événements courants :
     'click'  → clic de souris
@@ -72,12 +99,12 @@ function setupUpload(inputId, previewId, zoneId) {
       event.target.files[0] → le premier (et seul) fichier
     */
     const file = event.target.files[0];
- 
+
     /* Garde-fou : si aucun fichier, on s'arrête */
     if (!file) return;
- 
+
     const reader = new FileReader();
- 
+
     /* Callback : s'exécute QUAND la lecture est terminée */
     reader.onload = function(e) {
       preview.src = e.target.result;  /* URL base64 de l'image */
@@ -85,7 +112,7 @@ function setupUpload(inputId, previewId, zoneId) {
       zone.classList.add('has-photo'); /* modifie le style de la zone */
       zone.querySelector('.upload-placeholder').style.display = 'none';
     };
- 
+
     reader.readAsDataURL(file);
   });
 }
@@ -94,9 +121,10 @@ function setupUpload(inputId, previewId, zoneId) {
 setupUpload('photoProfil', 'previewProfil', 'zoneProfil');
 setupUpload('photoBody',   'previewBody',   'zoneBody');
 
+
 function validateForm() {
   let isValid = true; /* on suppose que c'est valide au départ */
- 
+
   /* --- Prénom --- */
   /*
     .value → récupère la valeur saisie dans l'input
@@ -110,7 +138,7 @@ function validateForm() {
   } else {
     clearError('prenom', 'prenomError');
   }
- 
+
   /* --- Nom --- */
   const nom = document.getElementById('nom').value.trim();
   if (!nom) {
@@ -119,7 +147,7 @@ function validateForm() {
   } else {
     clearError('nom', 'nomError');
   }
- 
+
   /* --- Email (avec vérification du format via regex) --- */
   const email = document.getElementById('email').value.trim();
   if (!email || !isValidEmail(email)) {
@@ -128,7 +156,7 @@ function validateForm() {
   } else {
     clearError('email', 'emailError');
   }
- 
+
   /* --- Téléphone --- */
   const telephone = document.getElementById('telephone').value.trim();
   if (!telephone) {
@@ -137,9 +165,8 @@ function validateForm() {
   } else {
     clearError('telephone', 'telephoneError');
   }
- 
-  /* --- Taille (entre 140 et 220 cm) --- */
 
+  /* --- Taille (entre 140 et 220 cm) --- */
   const taille = Number(document.getElementById('taille').value);
   if (!taille || taille < 140 || taille > 220) {
     showError('taille', 'tailleError');
@@ -147,7 +174,7 @@ function validateForm() {
   } else {
     clearError('taille', 'tailleError');
   }
- 
+
   /* --- Photos requises --- */
   if (!document.getElementById('photoProfil').files[0]) {
     document.getElementById('profilError').classList.add('visible');
@@ -155,14 +182,14 @@ function validateForm() {
   } else {
     document.getElementById('profilError').classList.remove('visible');
   }
- 
+
   if (!document.getElementById('photoBody').files[0]) {
     document.getElementById('bodyError').classList.add('visible');
     isValid = false;
   } else {
     document.getElementById('bodyError').classList.remove('visible');
   }
- 
+
   /* --- Genre (boutons radio) --- */
   const genre = document.querySelector('input[name="genre"]:checked');
   if (!genre) {
@@ -171,7 +198,7 @@ function validateForm() {
   } else {
     document.getElementById('genreError').classList.remove('visible');
   }
- 
+
   /* --- Taille haut (boutons radio) --- */
   /*
     querySelector avec :checked trouve le radio sélectionné.
@@ -184,7 +211,7 @@ function validateForm() {
   } else {
     document.getElementById('tailleHautError').classList.remove('visible');
   }
- 
+
   /* --- Taille bas --- */
   const tailleBas = document.querySelector('input[name="tailleBas"]:checked');
   if (!tailleBas) {
@@ -193,7 +220,7 @@ function validateForm() {
   } else {
     document.getElementById('tailleBasError').classList.remove('visible');
   }
- 
+
   /* --- Expérience --- */
   const experience = document.getElementById('experience').value;
   if (!experience) {
@@ -202,9 +229,10 @@ function validateForm() {
   } else {
     clearError('experience', 'experienceError');
   }
- 
+
   return isValid;
 }
+
 
 function collectFormData() {
   return {
@@ -214,18 +242,18 @@ function collectFormData() {
     telephone:     document.getElementById('telephone').value.trim(),
     instagram:     formatInstagramUrl(document.getElementById('instagram').value),
     taille:        document.getElementById('taille').value,
- 
+
     genre:         (document.querySelector('input[name="genre"]:checked') || {}).value || '',
- 
+
     /* --- Mensurations (champs numériques optionnels) --- */
     poitrine:      document.getElementById('poitrine').value,
     tourTaille:    document.getElementById('tourTaille').value,
     hanches:       document.getElementById('hanches').value,
     pointure:      document.getElementById('pointure').value,
- 
+
     tailleHaut:    (document.querySelector('input[name="tailleHaut"]:checked') || {}).value || '',
     tailleBas:     (document.querySelector('input[name="tailleBas"]:checked') || {}).value || '',
- 
+
     experience:    document.getElementById('experience').value,
     disponibilite: document.getElementById('disponibilite').value,
 
@@ -239,9 +267,9 @@ function collectFormData() {
 
 
 form.addEventListener('submit', async function(event) {
-  
+
   event.preventDefault();
- 
+
   /* On valide d'abord */
   if (!validateForm()) {
     /* Scroll vers la première erreur visible */
@@ -251,38 +279,76 @@ form.addEventListener('submit', async function(event) {
     }
     return; /* on arrête ici si invalide */
   }
- 
+
   /* On désactive le bouton pour éviter les double-clics */
   submitBtn.disabled = true;
   submitBtn.textContent = 'Envoi en cours…';
- 
-  /* On collecte les données */
-  const data = collectFormData();
- 
-  
-  console.log('📦 Données prêtes à envoyer :', data);
- 
-  /* Simulation d'un délai d'envoi (1.5 secondes) */
-  /* À REMPLACER par : await fetch(URL_GOOGLE_SCRIPT, {...}) */
-  await new Promise(resolve => setTimeout(resolve, 1500));
- 
-  /* Succès : on cache le formulaire, on affiche le message */
-  form.style.display = 'none';
-  successMsg.classList.add('visible');
-  successMsg.scrollIntoView({ behavior: 'smooth' });
-});
- 
- 
 
+  try {
+    /*
+      📘 ÉTAPE 1 — Convertir les 2 photos en base64
+      await attend la fin de la conversion avant de continuer.
+    */
+    const photoProfilFile = document.getElementById('photoProfil').files[0];
+    const photoBodyFile   = document.getElementById('photoBody').files[0];
+
+    const photoProfilBase64 = await fileToBase64(photoProfilFile);
+    const photoBodyBase64   = await fileToBase64(photoBodyFile);
+
+    /*
+      📘 ÉTAPE 2 — Préparer les données
+      L'opérateur ... (spread) recopie collectFormData() dans
+      l'objet final et on ajoute les deux photos en base64.
+    */
+    const data = {
+      ...collectFormData(),
+      photoProfil: photoProfilBase64,
+      photoBody:   photoBodyBase64
+    };
+
+    console.log('📦 Envoi vers Apps Script…');
+
+    /*
+      📘 ÉTAPE 3 — Envoi à Apps Script avec fetch()
+
+      mode: 'no-cors' contourne les restrictions navigateur pour
+      Apps Script. On ne peut pas lire la réponse mais
+      les données sont bien envoyées et traitées côté serveur.
+    */
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(data)
+    });
+
+    console.log('✅ Données envoyées avec succès');
+
+    /* Succès : on cache le formulaire, on affiche le message */
+    form.style.display = 'none';
+    successMsg.classList.add('visible');
+    successMsg.scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    /*
+      Si quoi que ce soit échoue (réseau, conversion, serveur),
+      on revient à l'état initial du bouton et on alerte l'utilisateur.
+    */
+    console.error('❌ Erreur lors de l\'envoi :', err);
+    alert('Une erreur est survenue. Vérifie ta connexion et réessaie.');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Envoyer ma candidature';
+  }
+});
+
+
+/* Validation en temps réel — efface l'erreur dès que l'utilisateur tape */
 ['prenom', 'nom', 'email', 'telephone', 'taille'].forEach((id) => {
   const el = document.getElementById(id);
   if (!el) return;
- 
+
   el.addEventListener('input', () => {
     if (el.value.trim()) {
       clearError(id, id + 'Error');
     }
   });
 });
- 
- 
