@@ -82,15 +82,6 @@ function setupUpload(inputId, previewId, zoneId) {
   const preview = document.getElementById(previewId);
   const zone    = document.getElementById(zoneId);
 
-  /*
-    Événements courants :
-    'click'  → clic de souris
-    'change' → changement de valeur (input, select, file)
-    'input'  → chaque frappe dans un champ texte
-    'submit' → soumission d'un formulaire
-    'focus'  → quand un champ reçoit le focus
-    'blur'   → quand un champ perd le focus
-  */
   input.addEventListener('change', function(event) {
     /*
       event = objet automatiquement passé par le navigateur.
