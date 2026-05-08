@@ -63,7 +63,7 @@ function formatInstagramUrl(input) {
 
 
 /* ─────────────────────────────────────────────────────────────
-   📘 fileToBase64 — convertit une image en chaîne base64
+   fileToBase64 — convertit une image en chaîne base64
    Nécessaire pour envoyer la photo dans une requête JSON.
    On encapsule FileReader dans une Promise pour utiliser await.
 ───────────────────────────────────────────────────────────── */
@@ -83,12 +83,7 @@ function setupUpload(inputId, previewId, zoneId) {
   const zone    = document.getElementById(zoneId);
 
   input.addEventListener('change', function(event) {
-    /*
-      event = objet automatiquement passé par le navigateur.
-      event.target          → l'élément qui a déclenché l'événement
-      event.target.files    → la liste des fichiers sélectionnés
-      event.target.files[0] → le premier (et seul) fichier
-    */
+    
     const file = event.target.files[0];
 
     /* Garde-fou : si aucun fichier, on s'arrête */
@@ -227,6 +222,9 @@ function validateForm() {
 
 function collectFormData() {
   return {
+    
+    website:       document.getElementById('website').value,
+
     prenom:        document.getElementById('prenom').value.trim(),
     nom:           document.getElementById('nom').value.trim(),
     email:         document.getElementById('email').value.trim(),
@@ -277,7 +275,7 @@ form.addEventListener('submit', async function(event) {
 
   try {
     /*
-      📘 ÉTAPE 1 — Convertir les 2 photos en base64
+      ÉTAPE 1 — Convertir les 2 photos en base64
       await attend la fin de la conversion avant de continuer.
     */
     const photoProfilFile = document.getElementById('photoProfil').files[0];
@@ -287,7 +285,7 @@ form.addEventListener('submit', async function(event) {
     const photoBodyBase64   = await fileToBase64(photoBodyFile);
 
     /*
-      📘 ÉTAPE 2 — Préparer les données
+      ÉTAPE 2 — Préparer les données
       L'opérateur ... (spread) recopie collectFormData() dans
       l'objet final et on ajoute les deux photos en base64.
     */
@@ -300,7 +298,7 @@ form.addEventListener('submit', async function(event) {
     console.log('📦 Envoi vers Apps Script…');
 
     /*
-      📘 ÉTAPE 3 — Envoi à Apps Script avec fetch()
+      ÉTAPE 3 — Envoi à Apps Script avec fetch()
 
       mode: 'no-cors' contourne les restrictions navigateur pour
       Apps Script. On ne peut pas lire la réponse mais

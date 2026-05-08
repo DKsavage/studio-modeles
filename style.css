@@ -36,18 +36,6 @@
 }
 
 
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #2 — RESET CSS
-   Chaque navigateur a ses propres styles par défaut.
-   On remet tout à zéro pour partir d'une base identique.
-
-   * = sélecteur universel (cible TOUS les éléments)
-   ::before, ::after = pseudo-éléments (on en parle plus bas)
-
-   box-sizing: border-box → LA règle la plus importante du CSS moderne.
-   Par défaut, width:200px + padding:20px = 240px au total.
-   Avec border-box, c'est toujours 200px (padding inclus).
-───────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
@@ -63,20 +51,6 @@ body {
   line-height: 1.6;  /* interligne = 1.6× la taille de la police */
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #3 — FLEXBOX
-   display: flex active Flexbox sur le PARENT.
-   Les enfants directs deviennent des "flex items".
-
-   Propriétés clés :
-   - flex-direction : row (défaut, horizontal) | column (vertical)
-   - justify-content : alignement sur l'axe principal
-       → flex-start | center | space-between | space-around
-   - align-items : alignement sur l'axe secondaire
-       → flex-start | center | flex-end | stretch
-   - gap : espace entre les enfants
-───────────────────────────────────────────────────────────── */
 header {
   padding: 24px 40px;
   border-bottom: 1px solid var(--gris-clair);
@@ -109,13 +83,6 @@ header {
   border-radius: 20px; /* très arrondi = pilule */
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #4 — clamp() pour des tailles fluides
-   clamp(min, préféré, max)
-   La valeur s'adapte à l'écran, mais reste entre min et max.
-   5vw = 5% de la largeur de l'écran.
-───────────────────────────────────────────────────────────── */
 .hero {
   text-align: center;
   padding: 64px 24px 52px;
@@ -157,16 +124,6 @@ main {
   padding: 56px 24px 100px;
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #5 — CSS GRID
-   display: grid active Grid sur le PARENT.
-   Grid gère les 2 axes (lignes + colonnes) en même temps.
-
-   grid-template-columns: repeat(2, 1fr)
-   → 2 colonnes de taille égale.
-   fr = "fraction" de l'espace disponible (unité propre à Grid).
-───────────────────────────────────────────────────────────── */
 .form-section {
   margin-bottom: 48px;
 }
@@ -201,11 +158,6 @@ main {
 }
 
 
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #6 — grid-column: 1 / -1
-   Dans une grille, chaque cellule occupe 1 colonne par défaut.
-   1 / -1 = "de la 1ère à la dernière colonne" = pleine largeur.
-───────────────────────────────────────────────────────────── */
 .full-width {
   grid-column: 1 / -1;
 }
@@ -229,17 +181,6 @@ label {
   color: var(--noir);
 }
 
-
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #7 — CIBLER PLUSIEURS SÉLECTEURS
-   On sépare par des virgules pour appliquer les mêmes styles.
-
-   📘 COURS CSS #8 — PSEUDO-CLASSES
-   :focus = quand l'élément est sélectionné (clic ou Tab)
-   :hover = quand la souris passe dessus
-   :checked = quand une checkbox/radio est cochée
-   :disabled = quand l'élément est désactivé
-───────────────────────────────────────────────────────────── */
 input[type="text"],
 input[type="email"],
 input[type="tel"],
@@ -274,11 +215,6 @@ select.error {
 }
 
 
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #9 — PERSONNALISER UN <select>
-   appearance: none retire le style natif du navigateur.
-   On injecte notre propre flèche via background-image (SVG inline).
-───────────────────────────────────────────────────────────── */
 select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -320,14 +256,6 @@ select {
 }
 
 
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #10 — UPLOAD DE FICHIER STYLISÉ
-   <input type="file"> est difficile à styliser directement.
-   Astuce : on le rend invisible (opacity:0 + position:absolute)
-   et on affiche une zone stylisée dessous.
-   L'input invisible capte quand même les clics car il est
-   "par-dessus" toute la zone (z-index: 2).
-───────────────────────────────────────────────────────────── */
 .uploads-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -561,14 +489,17 @@ select {
   font-size: 0.9rem;
 }
 
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
 
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #13 — MEDIA QUERIES (responsive design)
-   @media (max-width: 640px) { ... }
-   → Ces règles s'appliquent SEULEMENT si l'écran < 640px.
-
-   On passe de 2 colonnes à 1 colonne sur mobile.
-───────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
   header {
     padding: 16px 20px;
