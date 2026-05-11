@@ -303,20 +303,21 @@ form.addEventListener('submit', async function(event) {
 
     console.log('📦 Envoi vers Apps Script…');
 
-    /*
-      ÉTAPE 3 — Envoi à Apps Script avec fetch()
-
-      mode: 'no-cors' contourne les restrictions navigateur pour
-      Apps Script. On ne peut pas lire la réponse mais
-      les données sont bien envoyées et traitées côté serveur.
-    */
-    await fetch(APPS_SCRIPT_URL, {
+    const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      body: JSON.stringify(data)
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(data),
+      redirect: 'follow'
     });
-
-    console.log('✅ Données envoyées avec succès');
+ 
+    const result = await response.json();
+    console.log('✅ Réponse du serveur :', result);
+ 
+    if (!result.success) {
+      throw new Error(result.message || 'Erreur inconnue');
+    }
 
     /* Succès : on cache le formulaire, on affiche le message */
     form.style.display = 'none';
