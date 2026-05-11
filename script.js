@@ -222,7 +222,7 @@ function validateForm() {
 
 function collectFormData() {
   return {
-    
+
     website:       document.getElementById('website').value,
 
     prenom:        document.getElementById('prenom').value.trim(),
@@ -274,6 +274,10 @@ form.addEventListener('submit', async function(event) {
   submitBtn.textContent = 'Envoi en cours…';
 
   try {
+
+    const recaptchaToken = await grecaptcha.execute(RECAPTCHA_SITE_KEY, {
+      action: 'submit'
+    });
     /*
       ÉTAPE 1 — Convertir les 2 photos en base64
       await attend la fin de la conversion avant de continuer.
@@ -292,7 +296,8 @@ form.addEventListener('submit', async function(event) {
     const data = {
       ...collectFormData(),
       photoProfil: photoProfilBase64,
-      photoBody:   photoBodyBase64
+      photoBody:   photoBodyBase64,
+      recaptchaToken: recaptchaToken
     };
 
     console.log('📦 Envoi vers Apps Script…');
