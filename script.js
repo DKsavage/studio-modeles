@@ -7,6 +7,7 @@
    Si un jour tu redéploies, remplace cette URL ici.
 ───────────────────────────────────────────────────────────── */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtidDnma9A01bpIc5dn5wmcbi5_CaCXcQXHQhqjumihx0XKlXs6eJ_DyjmU4JNEmjB/exec';
+const RECAPTCHA_SITE_KEY = '6LddUeAsAAAAAO4fcgYselTJy8a0EBen0SoPookQ';
 
 
 const form       = document.getElementById('modelForm');
