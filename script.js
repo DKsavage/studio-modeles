@@ -6,7 +6,7 @@
    C'est l'URL obtenue après le déploiement Apps Script.
    Si un jour tu redéploies, remplace cette URL ici.
 ───────────────────────────────────────────────────────────── */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtidDnma9A01bpIc5dn5wmcbi5_CaCXcQXHQhqjumihx0XKlXs6eJ_DyjmU4JNEmjB/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbWWeeljHY4Zt5UB98vICRDUuqXUGV02F73W_QxLkmMQEEnzbFYbe9NvNzpPNelaY/exec';
 const RECAPTCHA_SITE_KEY = '6LddUeAsAAAAAO4fcgYselTJy8a0EBen0SoPookQ';
 
 
