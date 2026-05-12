@@ -15,11 +15,6 @@ const submitBtn  = document.getElementById('submitBtn');
 const successMsg = document.getElementById('successMessage');
 
 
-/**
- * Affiche une erreur sur un champ.
- * @param {string} inputId - l'id de l'input
- * @param {string} errorId - l'id du message d'erreur
- */
 function showError(inputId, errorId) {
   const input = document.getElementById(inputId);
   const error = document.getElementById(errorId);
@@ -27,9 +22,6 @@ function showError(inputId, errorId) {
   if (error) error.classList.add('visible');
 }
 
-/**
- * Efface l'erreur sur un champ.
- */
 function clearError(inputId, errorId) {
   const input = document.getElementById(inputId);
   const error = document.getElementById(errorId);
@@ -49,25 +41,14 @@ function formatInstagramUrl(input) {
 
   pseudo = pseudo.replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, '');
 
-  if (pseudo.startsWith('@')) {
-    pseudo = pseudo.substring(1); /* substring(1) = à partir du 2e caractère */
-  }
-
-  if (pseudo.endsWith('/')) {
-    pseudo = pseudo.slice(0, -1); /* slice(0, -1) = tout sauf le dernier caractère */
-  }
+  if (pseudo.startsWith('@')) pseudo = pseudo.substring(1);
+  if (pseudo.endsWith('/')) pseudo = pseudo.slice(0, -1);
 
   if (!pseudo) return '';
-
   return `https://instagram.com/${pseudo}`;
 }
 
 
-/* ─────────────────────────────────────────────────────────────
-   fileToBase64 — convertit une image en chaîne base64
-   Nécessaire pour envoyer la photo dans une requête JSON.
-   On encapsule FileReader dans une Promise pour utiliser await.
-───────────────────────────────────────────────────────────── */
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -84,138 +65,70 @@ function setupUpload(inputId, previewId, zoneId) {
   const zone    = document.getElementById(zoneId);
 
   input.addEventListener('change', function(event) {
-    
     const file = event.target.files[0];
-
-    /* Garde-fou : si aucun fichier, on s'arrête */
     if (!file) return;
 
     const reader = new FileReader();
-
-    /* Callback : s'exécute QUAND la lecture est terminée */
     reader.onload = function(e) {
-      preview.src = e.target.result;  /* URL base64 de l'image */
-      preview.style.display = 'block'; /* affiche l'aperçu */
-      zone.classList.add('has-photo'); /* modifie le style de la zone */
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+      zone.classList.add('has-photo');
       zone.querySelector('.upload-placeholder').style.display = 'none';
     };
-
     reader.readAsDataURL(file);
   });
 }
 
-/* On initialise les deux zones d'upload */
 setupUpload('photoProfil', 'previewProfil', 'zoneProfil');
 setupUpload('photoBody',   'previewBody',   'zoneBody');
 
 
 function validateForm() {
-  let isValid = true; /* on suppose que c'est valide au départ */
+  let isValid = true;
 
-  /* --- Prénom --- */
-  /*
-    .value → récupère la valeur saisie dans l'input
-    .trim() → supprime les espaces en début et fin
-    Ex : "  Camille  " → "Camille"
-  */
   const prenom = document.getElementById('prenom').value.trim();
-  if (!prenom) {
-    showError('prenom', 'prenomError');
-    isValid = false;
-  } else {
-    clearError('prenom', 'prenomError');
-  }
+  if (!prenom) { showError('prenom', 'prenomError'); isValid = false; }
+  else { clearError('prenom', 'prenomError'); }
 
-  /* --- Nom --- */
   const nom = document.getElementById('nom').value.trim();
-  if (!nom) {
-    showError('nom', 'nomError');
-    isValid = false;
-  } else {
-    clearError('nom', 'nomError');
-  }
+  if (!nom) { showError('nom', 'nomError'); isValid = false; }
+  else { clearError('nom', 'nomError'); }
 
-  /* --- Email (avec vérification du format via regex) --- */
   const email = document.getElementById('email').value.trim();
-  if (!email || !isValidEmail(email)) {
-    showError('email', 'emailError');
-    isValid = false;
-  } else {
-    clearError('email', 'emailError');
-  }
+  if (!email || !isValidEmail(email)) { showError('email', 'emailError'); isValid = false; }
+  else { clearError('email', 'emailError'); }
 
-  /* --- Téléphone --- */
   const telephone = document.getElementById('telephone').value.trim();
-  if (!telephone) {
-    showError('telephone', 'telephoneError');
-    isValid = false;
-  } else {
-    clearError('telephone', 'telephoneError');
-  }
+  if (!telephone) { showError('telephone', 'telephoneError'); isValid = false; }
+  else { clearError('telephone', 'telephoneError'); }
 
-  /* --- Taille (entre 140 et 220 cm) --- */
   const taille = Number(document.getElementById('taille').value);
-  if (!taille || taille < 140 || taille > 220) {
-    showError('taille', 'tailleError');
-    isValid = false;
-  } else {
-    clearError('taille', 'tailleError');
-  }
+  if (!taille || taille < 140 || taille > 220) { showError('taille', 'tailleError'); isValid = false; }
+  else { clearError('taille', 'tailleError'); }
 
-  /* --- Photos requises --- */
   if (!document.getElementById('photoProfil').files[0]) {
-    document.getElementById('profilError').classList.add('visible');
-    isValid = false;
-  } else {
-    document.getElementById('profilError').classList.remove('visible');
-  }
+    document.getElementById('profilError').classList.add('visible'); isValid = false;
+  } else { document.getElementById('profilError').classList.remove('visible'); }
 
   if (!document.getElementById('photoBody').files[0]) {
-    document.getElementById('bodyError').classList.add('visible');
-    isValid = false;
-  } else {
-    document.getElementById('bodyError').classList.remove('visible');
-  }
+    document.getElementById('bodyError').classList.add('visible'); isValid = false;
+  } else { document.getElementById('bodyError').classList.remove('visible'); }
 
-  /* --- Genre (boutons radio) --- */
-  const genre = document.querySelector('input[name="genre"]:checked');
-  if (!genre) {
-    document.getElementById('genreError').classList.add('visible');
-    isValid = false;
-  } else {
-    document.getElementById('genreError').classList.remove('visible');
-  }
+  if (!document.querySelector('input[name="genre"]:checked')) {
+    document.getElementById('genreError').classList.add('visible'); isValid = false;
+  } else { document.getElementById('genreError').classList.remove('visible'); }
 
-  /* --- Taille haut (boutons radio) --- */
-  /*
-    querySelector avec :checked trouve le radio sélectionné.
-    Si aucun → retourne null → !null = true → erreur affichée.
-  */
-  const tailleHaut = document.querySelector('input[name="tailleHaut"]:checked');
-  if (!tailleHaut) {
-    document.getElementById('tailleHautError').classList.add('visible');
-    isValid = false;
-  } else {
-    document.getElementById('tailleHautError').classList.remove('visible');
-  }
+  if (!document.querySelector('input[name="tailleHaut"]:checked')) {
+    document.getElementById('tailleHautError').classList.add('visible'); isValid = false;
+  } else { document.getElementById('tailleHautError').classList.remove('visible'); }
 
-  /* --- Taille bas --- */
-  const tailleBas = document.querySelector('input[name="tailleBas"]:checked');
-  if (!tailleBas) {
-    document.getElementById('tailleBasError').classList.add('visible');
-    isValid = false;
-  } else {
-    document.getElementById('tailleBasError').classList.remove('visible');
-  }
+  if (!document.querySelector('input[name="tailleBas"]:checked')) {
+    document.getElementById('tailleBasError').classList.add('visible'); isValid = false;
+  } else { document.getElementById('tailleBasError').classList.remove('visible'); }
 
-  /* --- Expérience --- */
-  const experience = document.getElementById('experience').value;
-  if (!experience) {
-    showError('experience', 'experienceError');
-    isValid = false;
-  } else {
-    clearError('experience', 'experienceError');
-  }
+  if (!document.getElementById('experience').value) {
+    showError('experience', 'experienceError'); isValid = false;
+  } else { clearError('experience', 'experienceError'); }
 
   return isValid;
 }
@@ -223,112 +136,105 @@ function validateForm() {
 
 function collectFormData() {
   return {
-
     website:       document.getElementById('website').value,
-
     prenom:        document.getElementById('prenom').value.trim(),
     nom:           document.getElementById('nom').value.trim(),
     email:         document.getElementById('email').value.trim(),
     telephone:     document.getElementById('telephone').value.trim(),
     instagram:     formatInstagramUrl(document.getElementById('instagram').value),
     taille:        document.getElementById('taille').value,
-
     genre:         (document.querySelector('input[name="genre"]:checked') || {}).value || '',
-
-    /* --- Mensurations (champs numériques optionnels) --- */
     poitrine:      document.getElementById('poitrine').value,
     tourTaille:    document.getElementById('tourTaille').value,
     hanches:       document.getElementById('hanches').value,
     pointure:      document.getElementById('pointure').value,
-
     tailleHaut:    (document.querySelector('input[name="tailleHaut"]:checked') || {}).value || '',
     tailleBas:     (document.querySelector('input[name="tailleBas"]:checked') || {}).value || '',
-
     experience:    document.getElementById('experience').value,
     disponibilite: document.getElementById('disponibilite').value,
-
-    /*
-      new Date() = objet date représentant maintenant
-      .toLocaleDateString('fr-FR') → format "28/04/2026"
-    */
     dateInscription: new Date().toLocaleDateString('fr-FR'),
   };
 }
 
 
 form.addEventListener('submit', async function(event) {
-
   event.preventDefault();
 
-  /* On valide d'abord */
   if (!validateForm()) {
-    /* Scroll vers la première erreur visible */
     const firstError = document.querySelector('.error, .field-error.visible');
-    if (firstError) {
-      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    return; /* on arrête ici si invalide */
+    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
   }
 
-  /* On désactive le bouton pour éviter les double-clics */
   submitBtn.disabled = true;
   submitBtn.textContent = 'Envoi en cours…';
 
   try {
-
+    /* Génération du token reCAPTCHA */
     const recaptchaToken = await grecaptcha.execute(RECAPTCHA_SITE_KEY, {
       action: 'submit'
     });
-    /*
-      ÉTAPE 1 — Convertir les 2 photos en base64
-      await attend la fin de la conversion avant de continuer.
-    */
+
+    /* DEBUG : on logge la longueur du token pour vérifier qu'il existe bien */
+    console.log('🔑 Token reCAPTCHA généré, longueur :', recaptchaToken.length);
+    console.log('🔑 Début du token :', recaptchaToken.substring(0, 30) + '...');
+
+    /* Conversion des 2 photos en base64 */
     const photoProfilFile = document.getElementById('photoProfil').files[0];
     const photoBodyFile   = document.getElementById('photoBody').files[0];
 
     const photoProfilBase64 = await fileToBase64(photoProfilFile);
     const photoBodyBase64   = await fileToBase64(photoBodyFile);
 
-    /*
-      ÉTAPE 2 — Préparer les données
-      L'opérateur ... (spread) recopie collectFormData() dans
-      l'objet final et on ajoute les deux photos en base64.
-    */
     const data = {
       ...collectFormData(),
-      photoProfil: photoProfilBase64,
-      photoBody:   photoBodyBase64,
+      photoProfil:    photoProfilBase64,
+      photoBody:      photoBodyBase64,
       recaptchaToken: recaptchaToken
     };
+
+    /* DEBUG : on logge la valeur du honeypot pour la traçabilité */
+    console.log('🍯 Valeur du champ honeypot envoyé :', JSON.stringify(data.website));
 
     console.log('📦 Envoi vers Apps Script…');
 
     const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8'
-      },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(data),
       redirect: 'follow'
     });
- 
+
     const result = await response.json();
+
+    /* 🔍 DEBUG : on affiche le RAPPORT COMPLET reçu du serveur
+       L'objet _debug contient toutes les étapes franchies côté serveur. */
     console.log('✅ Réponse du serveur :', result);
- 
+    console.log('🔍 ===== RAPPORT DEBUG SERVEUR =====');
+    console.log('🔍 Version du code serveur :', result._debug && result._debug.version);
+    console.log('🔍 Étape atteinte :', result._debug && result._debug.step);
+    console.log('🔍 Champs reçus :', result._debug && result._debug.fields);
+    if (result._debug && result._debug.recaptcha) {
+      console.log('🔍 reCAPTCHA détails :', result._debug.recaptcha);
+    }
+    console.log('🔍 Debug complet :', result._debug);
+    console.log('🔍 ===================================');
+
     if (!result.success) {
       throw new Error(result.message || 'Erreur inconnue');
     }
 
-    /* Succès : on cache le formulaire, on affiche le message */
+    /* Avertit si le message est le faux succès (bot/recaptcha rejet) */
+    if (result.message === 'Candidature enregistrée' && !result.message.includes('succès')) {
+      console.warn('⚠️ Message faux-succès reçu — la candidature n\'a probablement PAS été enregistrée');
+      console.warn('⚠️ Regarde l\'étape atteinte ci-dessus pour comprendre où ça a bloqué');
+    }
+
     form.style.display = 'none';
     successMsg.classList.add('visible');
     successMsg.scrollIntoView({ behavior: 'smooth' });
 
   } catch (err) {
-    /*
-      Si quoi que ce soit échoue (réseau, conversion, serveur),
-      on revient à l'état initial du bouton et on alerte l'utilisateur.
-    */
     console.error('❌ Erreur lors de l\'envoi :', err);
     alert('Une erreur est survenue. Vérifie ta connexion et réessaie.');
     submitBtn.disabled = false;
@@ -337,14 +243,12 @@ form.addEventListener('submit', async function(event) {
 });
 
 
-/* Validation en temps réel — efface l'erreur dès que l'utilisateur tape */
+/* Validation en temps réel */
 ['prenom', 'nom', 'email', 'telephone', 'taille'].forEach((id) => {
   const el = document.getElementById(id);
   if (!el) return;
 
   el.addEventListener('input', () => {
-    if (el.value.trim()) {
-      clearError(id, id + 'Error');
-    }
+    if (el.value.trim()) clearError(id, id + 'Error');
   });
 });
