@@ -1,10 +1,14 @@
 'use strict';
 
+/* ═══════════════════════════════════════════════════════════════
+   LUMINA PHOTOGRAPHY — Frontend
+   Version : 1.0
+   ═══════════════════════════════════════════════════════════════ */
 
 /* ─────────────────────────────────────────────────────────────
-   📘 CONFIGURATION — URL de l'API Apps Script
-   C'est l'URL obtenue après le déploiement Apps Script.
-   Si un jour tu redéploies, remplace cette URL ici.
+   CONFIGURATION
+   APPS_SCRIPT_URL    : URL de l'API Apps Script (déploiement Web App)
+   RECAPTCHA_SITE_KEY : Clé publique reCAPTCHA v3 (liée au domaine)
 ───────────────────────────────────────────────────────────── */
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEq1l0jcBTKhkXdKCBOY339su5BPlhnaf5Hzr706uO6XOe4NxDrZy4N4KQxXc5A5ei/exec';
 const RECAPTCHA_SITE_KEY = '6LddUeAsAAAAAO4fcgYselTJy8a0EBen0SoPookQ';
@@ -14,6 +18,10 @@ const form       = document.getElementById('modelForm');
 const submitBtn  = document.getElementById('submitBtn');
 const successMsg = document.getElementById('successMessage');
 
+
+/* ─────────────────────────────────────────────────────────────
+   GESTION DES ERREURS
+───────────────────────────────────────────────────────────── */
 
 function showError(inputId, errorId) {
   const input = document.getElementById(inputId);
@@ -30,11 +38,19 @@ function clearError(inputId, errorId) {
 }
 
 
+/* ─────────────────────────────────────────────────────────────
+   VALIDATION & FORMATAGE
+───────────────────────────────────────────────────────────── */
+
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-
+/**
+ * Normalise l'entrée Instagram en URL propre.
+ * Accepte : @user, user, instagram.com/user, https://www.instagram.com/user/
+ * Retourne : https://instagram.com/user
+ */
 function formatInstagramUrl(input) {
   let pseudo = input.trim();
   if (!pseudo) return '';
@@ -49,6 +65,10 @@ function formatInstagramUrl(input) {
 }
 
 
+/* ─────────────────────────────────────────────────────────────
+   GESTION DES PHOTOS (upload + aperçu + conversion base64)
+───────────────────────────────────────────────────────────── */
+
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -57,7 +77,6 @@ function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
-
 
 function setupUpload(inputId, previewId, zoneId) {
   const input   = document.getElementById(inputId);
@@ -82,6 +101,11 @@ function setupUpload(inputId, previewId, zoneId) {
 setupUpload('photoProfil', 'previewProfil', 'zoneProfil');
 setupUpload('photoBody',   'previewBody',   'zoneBody');
 
+
+/* ─────────────────────────────────────────────────────────────
+   VALIDATION DU FORMULAIRE
+   Retourne true si tous les champs obligatoires sont valides.
+───────────────────────────────────────────────────────────── */
 
 function validateForm() {
   let isValid = true;
@@ -134,6 +158,10 @@ function validateForm() {
 }
 
 
+/* ─────────────────────────────────────────────────────────────
+   COLLECTE DES DONNÉES
+───────────────────────────────────────────────────────────── */
+
 function collectFormData() {
   return {
     website:       document.getElementById('website').value,
@@ -157,6 +185,14 @@ function collectFormData() {
 }
 
 
+/* ─────────────────────────────────────────────────────────────
+   SOUMISSION DU FORMULAIRE
+   1. Validation
+   2. Génération token reCAPTCHA
+   3. Conversion photos en base64
+   4. Envoi vers Apps Script
+───────────────────────────────────────────────────────────── */
+
 form.addEventListener('submit', async function(event) {
   event.preventDefault();
 
@@ -170,22 +206,19 @@ form.addEventListener('submit', async function(event) {
   submitBtn.textContent = 'Envoi en cours…';
 
   try {
-    /* Génération du token reCAPTCHA */
+    /* 🛡️ Génération du token reCAPTCHA v3 */
     const recaptchaToken = await grecaptcha.execute(RECAPTCHA_SITE_KEY, {
       action: 'submit'
     });
 
-    /* DEBUG : on logge la longueur du token pour vérifier qu'il existe bien */
-    console.log('🔑 Token reCAPTCHA généré, longueur :', recaptchaToken.length);
-    console.log('🔑 Début du token :', recaptchaToken.substring(0, 30) + '...');
-
-    /* Conversion des 2 photos en base64 */
+    /* 📸 Conversion des 2 photos en base64 */
     const photoProfilFile = document.getElementById('photoProfil').files[0];
     const photoBodyFile   = document.getElementById('photoBody').files[0];
 
     const photoProfilBase64 = await fileToBase64(photoProfilFile);
     const photoBodyBase64   = await fileToBase64(photoBodyFile);
 
+    /* 📦 Préparation des données */
     const data = {
       ...collectFormData(),
       photoProfil:    photoProfilBase64,
@@ -193,11 +226,8 @@ form.addEventListener('submit', async function(event) {
       recaptchaToken: recaptchaToken
     };
 
-    /* DEBUG : on logge la valeur du honeypot pour la traçabilité */
-    console.log('🍯 Valeur du champ honeypot envoyé :', JSON.stringify(data.website));
-
-    console.log('📦 Envoi vers Apps Script…');
-
+    /* 🚀 Envoi à Apps Script
+       Content-Type "text/plain" évite le preflight CORS bloqué par Apps Script. */
     const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -207,35 +237,17 @@ form.addEventListener('submit', async function(event) {
 
     const result = await response.json();
 
-    /* 🔍 DEBUG : on affiche le RAPPORT COMPLET reçu du serveur
-       L'objet _debug contient toutes les étapes franchies côté serveur. */
-    console.log('✅ Réponse du serveur :', result);
-    console.log('🔍 ===== RAPPORT DEBUG SERVEUR =====');
-    console.log('🔍 Version du code serveur :', result._debug && result._debug.version);
-    console.log('🔍 Étape atteinte :', result._debug && result._debug.step);
-    console.log('🔍 Champs reçus :', result._debug && result._debug.fields);
-    if (result._debug && result._debug.recaptcha) {
-      console.log('🔍 reCAPTCHA détails :', result._debug.recaptcha);
-    }
-    console.log('🔍 Debug complet :', result._debug);
-    console.log('🔍 ===================================');
-
     if (!result.success) {
       throw new Error(result.message || 'Erreur inconnue');
     }
 
-    /* Avertit si le message est le faux succès (bot/recaptcha rejet) */
-    if (result.message === 'Candidature enregistrée' && !result.message.includes('succès')) {
-      console.warn('⚠️ Message faux-succès reçu — la candidature n\'a probablement PAS été enregistrée');
-      console.warn('⚠️ Regarde l\'étape atteinte ci-dessus pour comprendre où ça a bloqué');
-    }
-
+    /* ✅ Succès : on cache le formulaire, on affiche la confirmation */
     form.style.display = 'none';
     successMsg.classList.add('visible');
     successMsg.scrollIntoView({ behavior: 'smooth' });
 
   } catch (err) {
-    console.error('❌ Erreur lors de l\'envoi :', err);
+    console.error('Erreur lors de l\'envoi :', err);
     alert('Une erreur est survenue. Vérifie ta connexion et réessaie.');
     submitBtn.disabled = false;
     submitBtn.textContent = 'Envoyer ma candidature';
@@ -243,7 +255,11 @@ form.addEventListener('submit', async function(event) {
 });
 
 
-/* Validation en temps réel */
+/* ─────────────────────────────────────────────────────────────
+   VALIDATION EN TEMPS RÉEL
+   Efface l'erreur dès que l'utilisateur recommence à taper.
+───────────────────────────────────────────────────────────── */
+
 ['prenom', 'nom', 'email', 'telephone', 'taille'].forEach((id) => {
   const el = document.getElementById(id);
   if (!el) return;
