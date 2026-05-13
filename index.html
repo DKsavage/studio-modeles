@@ -1,36 +1,65 @@
 <!DOCTYPE html>
-
+<!--
+  📘 HTML — La déclaration DOCTYPE
+  <!DOCTYPE html> dit au navigateur : "ce fichier suit les règles HTML5".
+  Toujours en première ligne.
+-->
 <html lang="fr">
-
+<!-- lang="fr" indique la langue. Utile pour le SEO et les lecteurs d'écran. -->
 
 <head>
-  
+  <!--
+    📘 HTML — Le <head> est INVISIBLE à l'écran.
+    C'est la configuration de la page : titre, polices, styles.
+  -->
   <meta charset="UTF-8" />
+  <!-- viewport rend la page responsive sur mobile -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lumina Photography — Inscription Modèles</title>
+  <title>Studio Modèles — Inscription</title>
 
   <!-- Polices Google Fonts chargées depuis internet -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 
+  <!--
+    📘 SÉPARATION DES FICHIERS
+    On charge notre fichier CSS externe avec <link>.
+    rel="stylesheet" = le type de relation : feuille de style.
+    href="style.css" = le chemin vers le fichier (même dossier ici).
+  -->
   <link rel="stylesheet" href="style.css" />
+
+  <!--
+    🛡️ Google reCAPTCHA v3 (invisible)
+    Ce script tourne en arrière-plan et analyse le comportement
+    de l'utilisateur. Au moment de l'envoi du formulaire, on
+    génère un "token" qu'Apps Script vérifiera côté serveur.
+
+    La Site Key est PUBLIQUE — on peut la voir avec "Code source".
+    C'est normal, elle est liée au domaine.
+  -->
   <script src="https://www.google.com/recaptcha/api.js?render=6LddUeAsAAAAAO4fcgYselTJy8a0EBen0SoPookQ"></script>
 </head>
 
 <body>
 
   <header>
-    <div class="logo">Lumina<span>Photography</span></div>
-    <div class="header-badge">Inscription — 2026</div>
+    <div class="logo">Studio<span>Modèles</span></div>
+    <div class="header-badge">Inscription — 2025</div>
   </header>
 
   <div class="hero">
-    <p class="hero-label">✦ Lumina ✦</p>
+    <p class="hero-label">✦ Agence de mannequinat ✦</p>
     <h1>Rejoignez notre<br /><em>Book de Modèles</em></h1>
-    <p>Remplissez ce formulaire avec soin. </p>
+    <p>Remplissez ce formulaire avec soin. Chaque information nous aide à vous proposer les missions les plus adaptées.</p>
   </div>
 
   <main>
 
+    <!--
+      📘 HTML — L'élément <form>
+      novalidate = désactive la validation native du navigateur.
+      On gère la validation en JS pour des messages personnalisés.
+    -->
     <form id="modelForm" novalidate>
 
       <!-- ════════════════════════════════════════
@@ -44,14 +73,19 @@
 
         <div class="uploads-grid">
 
+          <!--
+            📘 HTML — Upload de fichier
+            type="file" ouvre le sélecteur natif.
+            accept="image/*" filtre pour n'accepter que les images.
+          -->
           <div class="upload-group">
             <label>Photo de profil <span class="required">*</span></label>
             <div class="upload-zone" id="zoneProfil">
-              <input type="file" id="photoProfil" name="photoProfil" accept="image/*" />
+              <input type="file" id="photoProfil" name="photoProfil" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" />
               <div class="upload-placeholder">
                 <div class="upload-icon">🤳</div>
                 <div class="upload-label-main">Photo de profil</div>
-                <div class="upload-label-sub">Visage clair · Fond neutre</div>
+                <div class="upload-label-sub">Visage clair · JPG / PNG / HEIC</div>
               </div>
               <img class="upload-preview" id="previewProfil" src="" alt="Aperçu profil" />
             </div>
@@ -61,11 +95,11 @@
           <div class="upload-group">
             <label>Photo full body <span class="required">*</span></label>
             <div class="upload-zone" id="zoneBody">
-              <input type="file" id="photoBody" name="photoBody" accept="image/*" />
+              <input type="file" id="photoBody" name="photoBody" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" />
               <div class="upload-placeholder">
                 <div class="upload-icon">🧍</div>
                 <div class="upload-label-main">Photo en pied</div>
-                <div class="upload-label-sub">Corps entier · Tenue simple</div>
+                <div class="upload-label-sub">Corps entier · JPG / PNG / HEIC</div>
               </div>
               <img class="upload-preview" id="previewBody" src="" alt="Aperçu full body" />
             </div>
@@ -86,7 +120,12 @@
 
         <div class="form-grid">
 
-          
+          <!--
+            📘 HTML — label + input liés
+            for="prenom" sur le label DOIT correspondre à id="prenom" sur l'input.
+            Résultat : cliquer sur le label = focus sur le champ.
+            C'est important pour l'accessibilité.
+          -->
           <div class="field-group">
             <label for="prenom">Prénom <span class="required">*</span></label>
             <input type="text" id="prenom" name="prenom" placeholder="Camille" autocomplete="given-name" />
@@ -113,6 +152,13 @@
             <span class="field-error" id="telephoneError">Un numéro de téléphone est requis.</span>
           </div>
 
+          <!--
+            📘 HTML — Genre (boutons radio)
+            On réutilise la classe .size-selector / .size-btn déjà stylisée
+            dans style.css pour avoir le même look que les tailles XS/S/M.
+            C'est ça la PUISSANCE des classes CSS : on les écrit une fois
+            et on les réutilise partout où on veut le même style.
+          -->
           <div class="field-group full-width">
             <label>Genre <span class="required">*</span></label>
             <div class="size-selector">
@@ -127,6 +173,11 @@
             <input type="text" id="instagram" name="instagram" placeholder="@votre_pseudo" />
           </div>
 
+          <!--
+            📘 HTML — type="number" avec min/max
+            Le navigateur affiche des flèches pour incrémenter.
+            On valide aussi en JS pour des messages d'erreur personnalisés.
+          -->
           <div class="field-group">
             <label for="taille">Taille <span class="required">*</span></label>
             <div class="input-with-unit">
@@ -150,7 +201,12 @@
 
         <div class="form-grid">
 
-          
+          <!--
+            📘 HTML — Les mensurations en cm
+            On utilise type="number" + une unité visuelle (.unit)
+            placée à droite via CSS. Le navigateur n'affiche pas
+            "cm" automatiquement : c'est le span .unit qui le fait.
+          -->
           <div class="field-group">
             <label for="poitrine">Tour de poitrine</label>
             <div class="input-with-unit">
@@ -175,7 +231,10 @@
             </div>
           </div>
 
-          
+          <!--
+            📘 Pointure — EU = Europe (pointure standard française).
+            min/max évite les valeurs absurdes (3 ou 99).
+          -->
           <div class="field-group">
             <label for="pointure">Pointure</label>
             <div class="input-with-unit">
@@ -184,7 +243,12 @@
             </div>
           </div>
 
-          
+          <!--
+            📘 HTML — Boutons radio
+            type="radio" avec le même name="tailleHaut" les groupe :
+            sélectionner un = désélectionner les autres automatiquement.
+            La valeur envoyée = l'attribut value du radio coché.
+          -->
           <div class="field-group full-width">
             <label>Taille haut <span class="required">*</span></label>
             <div class="size-selector">
@@ -225,7 +289,11 @@
 
         <div class="form-grid">
 
-        
+          <!--
+            📘 HTML — <select> = liste déroulante
+            <option value=""> = option par défaut (placeholder).
+            La valeur envoyée = l'attribut value de l'option sélectionnée.
+          -->
           <div class="field-group">
             <label for="experience">Niveau d'expérience <span class="required">*</span></label>
             <select id="experience" name="experience">
@@ -252,6 +320,22 @@
         </div>
       </div>
 
+      <!--
+        ════════════════════════════════════════
+        🍯 HONEYPOT — Piège anti-bot invisible
+        ════════════════════════════════════════
+        Ce champ est INVISIBLE pour les humains (caché par CSS).
+        Les bots ne savent pas qu'il est caché, ils le remplissent
+        automatiquement. Côté serveur, on vérifie :
+        - Champ vide → humain ✅
+        - Champ rempli → bot ❌
+
+        ⚠️ Bonnes pratiques :
+        - Le champ a un name banal ("website") qui attire les bots
+        - tabindex="-1" empêche le clavier d'y accéder (accessibilité)
+        - autocomplete="off" empêche le navigateur de pré-remplir
+        - aria-hidden="true" cache le champ aux lecteurs d'écran
+      -->
       <div class="honeypot" aria-hidden="true">
         <label for="website">Ne pas remplir ce champ</label>
         <input
@@ -282,7 +366,14 @@
 
   </main>
 
-  
+  <!--
+    📘 SÉPARATION DES FICHIERS
+    On charge notre fichier JS externe avec <script src="...">
+    PLACEMENT À LA FIN DU <body> : essentiel !
+    Raison : le navigateur lit le HTML de haut en bas. Si JS est en
+    haut, il cherche des éléments qui n'existent pas encore → erreur.
+    En bas, tout le HTML est chargé quand JS s'exécute.
+  -->
   <script src="script.js"></script>
 
 </body>

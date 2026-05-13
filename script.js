@@ -66,17 +66,92 @@ function formatInstagramUrl(input) {
 
 
 /* ─────────────────────────────────────────────────────────────
-   GESTION DES PHOTOS (upload + aperçu + conversion base64)
+   GESTION DES PHOTOS (upload + aperçu + compression)
+
+   📘 COMPRESSION D'IMAGE — Pourquoi et comment ?
+   ─────────────────────────────────────────────────────────────
+   Une photo iPhone moderne fait 8-15 Mo. C'est énorme.
+   Pour notre usage (afficher sur écran), 400 Ko suffit largement.
+
+   Technique : on dessine l'image dans un <canvas> à taille réduite,
+   puis on l'exporte en JPEG avec une qualité de 85%.
+   Cette technique a 3 avantages majeurs :
+   1. Réduction massive de la taille (10× à 30× plus petit)
+   2. Conversion automatique HEIC → JPEG
+      (les iPhones envoient du HEIC qui n'est pas lisible partout)
+   3. Envoi vers le serveur 10× plus rapide
+
+   Paramètres ajustables :
+   - MAX_DIMENSION : taille max en pixels (1600px = full HD largeur)
+   - QUALITY : qualité JPEG entre 0 et 1 (0.85 = imperceptible visuellement)
 ───────────────────────────────────────────────────────────── */
 
-function fileToBase64(file) {
+const MAX_DIMENSION = 1600;  /* Largeur ou hauteur max en pixels */
+const QUALITY = 0.85;        /* Qualité JPEG 0-1 (0.85 = très bon compromis) */
+
+
+/**
+ * Compresse une image et retourne du base64 JPEG.
+ * Gère automatiquement HEIC, PNG, etc → JPEG.
+ *
+ * @param {File} file - Le fichier image à compresser
+ * @returns {Promise<string>} - base64 (data:image/jpeg;base64,...)
+ */
+function compressImage(file) {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload  = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('Erreur de lecture du fichier'));
-    reader.readAsDataURL(file);
+    /* On crée une URL temporaire pour charger l'image */
+    const imageUrl = URL.createObjectURL(file);
+    const img = new Image();
+
+    img.onload = function() {
+      /*
+        Étape 1 : calculer les nouvelles dimensions tout en gardant les proportions.
+        Si l'image est plus grande que MAX_DIMENSION sur un axe, on la réduit.
+      */
+      let { width, height } = img;
+
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        if (width > height) {
+          height = Math.round(height * (MAX_DIMENSION / width));
+          width = MAX_DIMENSION;
+        } else {
+          width = Math.round(width * (MAX_DIMENSION / height));
+          height = MAX_DIMENSION;
+        }
+      }
+
+      /*
+        Étape 2 : créer un canvas aux nouvelles dimensions
+        et y dessiner l'image redimensionnée.
+      */
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      /*
+        Étape 3 : exporter le canvas en JPEG compressé.
+        toDataURL retourne directement le base64 prêt à envoyer.
+      */
+      const base64 = canvas.toDataURL('image/jpeg', QUALITY);
+
+      /* On libère la mémoire en révoquant l'URL temporaire */
+      URL.revokeObjectURL(imageUrl);
+
+      resolve(base64);
+    };
+
+    img.onerror = function() {
+      URL.revokeObjectURL(imageUrl);
+      reject(new Error('Impossible de lire l\'image. Format non supporté ?'));
+    };
+
+    img.src = imageUrl;
   });
 }
+
 
 function setupUpload(inputId, previewId, zoneId) {
   const input   = document.getElementById(inputId);
@@ -211,12 +286,14 @@ form.addEventListener('submit', async function(event) {
       action: 'submit'
     });
 
-    /* 📸 Conversion des 2 photos en base64 */
+    /* 📸 Compression des 2 photos en base64 JPEG
+       Réduit drastiquement la taille (8 Mo → ~400 Ko)
+       Convertit automatiquement HEIC, PNG, etc → JPEG */
     const photoProfilFile = document.getElementById('photoProfil').files[0];
     const photoBodyFile   = document.getElementById('photoBody').files[0];
 
-    const photoProfilBase64 = await fileToBase64(photoProfilFile);
-    const photoBodyBase64   = await fileToBase64(photoBodyFile);
+    const photoProfilBase64 = await compressImage(photoProfilFile);
+    const photoBodyBase64   = await compressImage(photoBodyFile);
 
     /* 📦 Préparation des données */
     const data = {
