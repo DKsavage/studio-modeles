@@ -1,0 +1,70 @@
+# ═══════════════════════════════════════════════════════════════
+# .gitignore — Fichiers à NE JAMAIS push sur GitHub
+# ═══════════════════════════════════════════════════════════════
+
+# Fichiers système macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Fichiers système Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Fichiers système Linux
+*~
+.directory
+
+# Éditeurs / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Fichiers de log
+*.log
+logs/
+npm-debug.log*
+
+# Variables d'environnement (CONTIENNENT SOUVENT DES CLÉS API !)
+.env
+.env.local
+.env.*.local
+
+# Backups
+*.backup
+*.bak
+*.old
+backup/
+
+# Dossiers de dépendances (très lourds, jamais à push)
+node_modules/
+bower_components/
+
+# Fichiers de build
+dist/
+build/
+out/
+
+# Cache
+.cache/
+.tmp/
+.temp/
+
+# Fichiers personnels (notes, todos)
+notes.md
+TODO.md
+brouillon/
+
+# Tests temporaires
+test.html
+debug.js
+temp.*
+
+# Secrets / API keys (très important)
+secrets.json
+config.private.js
