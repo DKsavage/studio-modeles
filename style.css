@@ -141,7 +141,7 @@ main {
   font-family: var(--font-titre);
   font-size: 2.2rem;
   font-weight: 300;
-  color: var(--gris-bord);
+  color: #8a8a8a; /* #d0d0d0 échouait WCAG (ratio 1.47) — 8a8a8a = 3.3:1 ✓ */
   line-height: 1;
 }
 
