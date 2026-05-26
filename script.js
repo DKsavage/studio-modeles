@@ -10,7 +10,7 @@
    APPS_SCRIPT_URL    : URL de l'API Apps Script (déploiement Web App)
    RECAPTCHA_SITE_KEY : Clé publique reCAPTCHA v3 (liée au domaine)
 ───────────────────────────────────────────────────────────── */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEq1l0jcBTKhkXdKCBOY339su5BPlhnaf5Hzr706uO6XOe4NxDrZy4N4KQxXc5A5ei/exec';
+const API_URL = '/api/submit';
 const RECAPTCHA_SITE_KEY = '6LddUeAsAAAAAO4fcgYselTJy8a0EBen0SoPookQ';
 
 const form       = document.getElementById('modelForm');
@@ -302,13 +302,11 @@ form.addEventListener('submit', async function(event) {
       recaptchaToken: recaptchaToken
     };
 
-    /* 🚀 Envoi à Apps Script
-       Content-Type "text/plain" évite le preflight CORS bloqué par Apps Script. */
-    const response = await fetch(APPS_SCRIPT_URL, {
+    /* 🚀 Envoi à la Vercel Function — même domaine, pas de CORS */
+    const response = await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-      redirect: 'follow'
     });
 
     const result = await response.json();
