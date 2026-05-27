@@ -68,3 +68,4 @@ temp.*
 # Secrets / API keys (très important)
 secrets.json
 config.private.js
+.vercel

@@ -119,10 +119,40 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ success: false, message: 'Format de photo invalide.' });
   }
 
-  /* ── 5. SAUVEGARDE ──────────────────────────────────────────
-     TODO Phase 4B : sauvegarder dans Supabase (remplace Sheets)
-     TODO Phase 4C : uploader les photos dans Cloudflare R2 (remplace Drive)
-  ──────────────────────────────────────────────────────────── */
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+
+  const supabaseRes = await fetch(`${supabaseUrl}/rest/v1/candidatures`, {
+    method: 'POST',
+    headers: {
+      'apikey': supabaseKey,
+      'Authorization': `Bearer ${supabaseKey}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=minimal'
+    },
+    body: JSON.stringify({
+      prenom:       data.prenom,
+      nom:          data.nom,
+      email:        data.email,
+      telephone:    data.telephone,
+      instagram:    data.instagram    || null,
+      taille:       data.taille       ? parseInt(data.taille)    : null,
+      genre:        data.genre        || null,
+      poitrine:     data.poitrine     ? parseInt(data.poitrine)  : null,
+      tour_taille:  data.tourTaille   ? parseInt(data.tourTaille): null,
+      hanches:      data.hanches      ? parseInt(data.hanches)   : null,
+      pointure:     data.pointure     ? parseInt(data.pointure)  : null,
+      taille_haut:  data.tailleHaut   || null,
+      taille_bas:   data.tailleBas    || null,
+      experience:   data.experience   || null,
+      disponibilite:data.disponibilite|| null,
+    })
+  });
+
+  if (!supabaseRes.ok) {
+    const errText = await supabaseRes.text();
+    throw new Error(`Supabase: ${supabaseRes.status} — ${errText}`);
+  }
 
   return res.status(200).json({ success: true });
 }
