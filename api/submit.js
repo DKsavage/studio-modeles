@@ -1,7 +1,7 @@
 'use strict';
 
 /*
-  📘 VERCEL FUNCTION — api/submit.js
+  VERCEL FUNCTION — api/submit.js
   ─────────────────────────────────────────────────────────────
   Vercel détecte ce fichier automatiquement.
   POST /api/submit → cette fonction s'exécute côté serveur.
@@ -19,15 +19,43 @@ const MAX_PHOTO_BYTES = 1.5 * 1024 * 1024;
 const RATE_LIMIT_MS = 60_000;
 
 /*
-  📘 RATE LIMIT en mémoire
+  RATE LIMIT en mémoire
   En production réelle, on utiliserait Redis ou Upstash.
   Ici : Map JS en mémoire — suffit pour commencer.
   Limite : réinitialisée à chaque redéploiement (acceptable en dev).
 */
 const lastSubmitByIp = new Map();
 
+function base64ToBuffer(base64Data){
+  const matches = base64Data.match(/^data:(image\/\w+);base64,(.+)$/);
+  const base64Pure = matches[2];
+  return Buffer.from(base64Pure, 'base64');
+}
+
+async function uploadPhoto(buffer, fileName, supabaseUrl, supabaseKey) {
+    const uploadRes = await fetch(
+      `${supabaseUrl}/storage/v1/object/photos-candidatures/${fileName}`,
+      {
+        method: 'POST',
+        headers: {
+          'apikey':        supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type':  'image/jpeg',
+        },
+        body: buffer,
+      }
+    );
+
+    if (!uploadRes.ok) {
+      const err = await uploadRes.text();
+      throw new Error(`Upload photo: ${uploadRes.status} — ${err}`);
+    }
+
+    return `photos-candidatures/${fileName}`;
+}
+
 /*
-  📘 export default
+  export default
   Syntaxe Vercel pour déclarer le handler de la route.
   req = requête entrante (body, headers, méthode)
   res = réponse à envoyer (status, json, etc.)
@@ -80,7 +108,7 @@ module.exports = async function handler(req, res) {
   const recaptchaJson = await recaptchaRes.json();
 
   /*
-    📘 score reCAPTCHA v3
+    score reCAPTCHA v3
     0.0 = très probablement un bot
     1.0 = très probablement un humain
     Seuil 0.5 = compromis standard en production
@@ -122,6 +150,19 @@ module.exports = async function handler(req, res) {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
+  /* Génère un nom de fichier unique : email + timestamp */
+  const timestamp = Date.now();
+  const baseName = data.email.replace(/[@.]/g, '_') + '_' + timestamp;
+
+  /* Convertit base64 → Buffer et upload les 2 photos */
+  const profilBuffer = base64ToBuffer(data.photoProfil);
+  const bodyBuffer   = base64ToBuffer(data.photoBody);
+
+  const profilPath = await uploadPhoto(profilBuffer, `${baseName}_profil.jpg`,
+  supabaseUrl, supabaseKey);
+  const bodyPath   = await uploadPhoto(bodyBuffer,   `${baseName}_body.jpg`,
+  supabaseUrl, supabaseKey);
+
   const supabaseRes = await fetch(`${supabaseUrl}/rest/v1/candidatures`, {
     method: 'POST',
     headers: {
@@ -146,6 +187,8 @@ module.exports = async function handler(req, res) {
       taille_bas:   data.tailleBas    || null,
       experience:   data.experience   || null,
       disponibilite:data.disponibilite|| null,
+      photo_profil_url: profilPath,
+      photo_body_url:   bodyPath,
     })
   });
 
@@ -158,7 +201,7 @@ module.exports = async function handler(req, res) {
 }
 
 /*
-  📘 CONFIG VERCEL — bodyParser
+  CONFIG VERCEL — bodyParser
   Par défaut, Vercel limite le body à 1 Mo.
   On monte à 10 Mo pour accepter 2 photos base64 (~2 Mo chacune en JPEG compressé).
 */
