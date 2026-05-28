@@ -20,8 +20,17 @@
     .badge { display: inline-block; background: var(--gris-clair); border-radius: 20px; padding: 2px 10px; font-size: 0.72rem; margin: 2px; }
     .loading { text-align: center; padding: 80px; color: var(--gris-texte); }
     .count { font-size: 0.82rem; color: var(--gris-texte); margin-bottom: 12px; }
-    .search-input { width: 100%; padding: 13px 16px; border: 1px solid var(--gris-bord); border-radius: var(--radius); font-family: var(--font-corps); font-size: 0.92rem; margin-bottom: 24px; outline: none; background: var(--blanc); color: var(--noir); }
+    .search-input { width: 100%; padding: 13px 16px; border: 1px solid var(--gris-bord); border-radius: var(--radius); font-family: var(--font-corps); font-size: 0.92rem; margin-bottom: 20px; outline: none; background: var(--blanc); color: var(--noir); }
     .search-input:focus { border-color: var(--noir); box-shadow: 0 0 0 3px rgba(10,10,10,0.07); }
+    .filters { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 1px solid var(--gris-clair); }
+    .filter-group { display: flex; flex-direction: column; gap: 8px; }
+    .filter-label { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gris-texte); font-weight: 500; }
+    .filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { padding: 5px 14px; border: 1px solid var(--gris-bord); border-radius: 20px; font-size: 0.75rem; font-family: var(--font-corps); cursor: pointer; background: var(--blanc); color: var(--gris-texte); transition: all 0.2s ease; }
+    .chip:hover { border-color: var(--noir); color: var(--noir); }
+    .chip.active { background: var(--noir); border-color: var(--noir); color: var(--blanc); }
+    .reset-btn { align-self: flex-end; padding: 5px 14px; border: none; background: none; font-size: 0.75rem; color: var(--gris-texte); cursor: pointer; text-decoration: underline; font-family: var(--font-corps); }
+    .reset-btn:hover { color: var(--noir); }
   </style>
 </head>
 <body>
@@ -34,7 +43,51 @@
   <div class="dashboard">
     <h2>Candidatures</h2>
     <p class="count" id="count">Chargement…</p>
-    <input type="search" id="search" class="search-input" placeholder="Rechercher par nom, email, expérience…" />
+
+    <input type="search" id="search" class="search-input" placeholder="Rechercher par nom, email…" />
+
+    <div class="filters">
+      <div class="filter-group">
+        <span class="filter-label">Genre</span>
+        <div class="filter-chips">
+          <button class="chip" data-filter="genre" data-value="Femme">Femme</button>
+          <button class="chip" data-filter="genre" data-value="Homme">Homme</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Expérience</span>
+        <div class="filter-chips">
+          <button class="chip" data-filter="experience" data-value="debutant">Débutant</button>
+          <button class="chip" data-filter="experience" data-value="intermediaire">Intermédiaire</button>
+          <button class="chip" data-filter="experience" data-value="confirme">Confirmé</button>
+          <button class="chip" data-filter="experience" data-value="professionnel">Professionnel</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Taille haut</span>
+        <div class="filter-chips">
+          <button class="chip" data-filter="taille_haut" data-value="XS">XS</button>
+          <button class="chip" data-filter="taille_haut" data-value="S">S</button>
+          <button class="chip" data-filter="taille_haut" data-value="M">M</button>
+          <button class="chip" data-filter="taille_haut" data-value="L">L</button>
+          <button class="chip" data-filter="taille_haut" data-value="XL">XL</button>
+          <button class="chip" data-filter="taille_haut" data-value="XXL">XXL</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Taille bas</span>
+        <div class="filter-chips">
+          <button class="chip" data-filter="taille_bas" data-value="XS">XS</button>
+          <button class="chip" data-filter="taille_bas" data-value="S">S</button>
+          <button class="chip" data-filter="taille_bas" data-value="M">M</button>
+          <button class="chip" data-filter="taille_bas" data-value="L">L</button>
+          <button class="chip" data-filter="taille_bas" data-value="XL">XL</button>
+          <button class="chip" data-filter="taille_bas" data-value="XXL">XXL</button>
+        </div>
+      </div>
+      <button class="reset-btn" id="reset">Réinitialiser</button>
+    </div>
+
     <div class="candidatures-grid" id="grid">
       <p class="loading">Chargement des candidatures…</p>
     </div>
@@ -42,6 +95,25 @@
 
   <script>
     let allCandidatures = [];
+    let activeFilters = { genre: null, experience: null, taille_haut: null, taille_bas: null };
+
+    function applyFilters() {
+      const q = document.getElementById('search').value.toLowerCase().trim();
+
+      const filtered = allCandidatures.filter(c => {
+        const matchSearch = !q ||
+          `${c.prenom} ${c.nom} ${c.email}`.toLowerCase().includes(q);
+
+        const matchGenre      = !activeFilters.genre      || c.genre      === activeFilters.genre;
+        const matchExperience = !activeFilters.experience || c.experience === activeFilters.experience;
+        const matchHaut       = !activeFilters.taille_haut|| c.taille_haut=== activeFilters.taille_haut;
+        const matchBas        = !activeFilters.taille_bas || c.taille_bas === activeFilters.taille_bas;
+
+        return matchSearch && matchGenre && matchExperience && matchHaut && matchBas;
+      });
+
+      renderCards(filtered);
+    }
 
     function renderCards(data) {
       const grid = document.getElementById('grid');
@@ -75,13 +147,36 @@
       `).join('');
     }
 
-    document.getElementById('search').addEventListener('input', function() {
-      const q = this.value.toLowerCase().trim();
-      const filtered = allCandidatures.filter(c =>
-        `${c.prenom} ${c.nom} ${c.email} ${c.experience} ${c.genre}`.toLowerCase().includes(q)
-      );
-      renderCards(filtered);
+    /* Chips — toggle actif/inactif */
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        const filter = this.dataset.filter;
+        const value  = this.dataset.value;
+
+        if (activeFilters[filter] === value) {
+          /* Déjà actif → désactiver */
+          activeFilters[filter] = null;
+          this.classList.remove('active');
+        } else {
+          /* Activer ce chip, désactiver les autres du même groupe */
+          document.querySelectorAll(`[data-filter="${filter}"]`).forEach(c => c.classList.remove('active'));
+          activeFilters[filter] = value;
+          this.classList.add('active');
+        }
+
+        applyFilters();
+      });
     });
+
+    /* Réinitialiser tous les filtres */
+    document.getElementById('reset').addEventListener('click', function() {
+      activeFilters = { genre: null, experience: null, taille_haut: null, taille_bas: null };
+      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+      document.getElementById('search').value = '';
+      renderCards(allCandidatures);
+    });
+
+    document.getElementById('search').addEventListener('input', applyFilters);
 
     async function loadCandidatures() {
       const grid = document.getElementById('grid');
