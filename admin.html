@@ -1,0 +1,97 @@
+ <!DOCTYPE html>
+  <html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Studio Modèles — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400
+  ;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .dashboard { max-width: 1200px; margin: 0 auto; padding: 48px 24px; }
+      .dashboard h2 { font-family: var(--font-titre); font-size: 2rem; font-weight:
+  300; margin-bottom: 32px; }
+      .candidatures-grid { display: grid; grid-template-columns: repeat(auto-fill,
+  minmax(320px, 1fr)); gap: 24px; }
+      .card { border: 1px solid var(--gris-clair); border-radius: var(--radius);
+  overflow: hidden; }
+      .card-photos { display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+  background: var(--gris-clair); }
+      .card-photos img { width: 100%; height: 200px; object-fit: cover;
+  object-position: top; cursor: pointer; }
+      .card-body { padding: 20px; }
+      .card-name { font-family: var(--font-titre); font-size: 1.4rem; font-weight:
+  600; margin-bottom: 4px; }
+      .card-meta { font-size: 0.78rem; color: var(--gris-texte); margin-bottom: 12px;
+  }
+      .card-info { font-size: 0.82rem; line-height: 1.8; }
+      .badge { display: inline-block; background: var(--gris-clair); border-radius:
+  20px; padding: 2px 10px; font-size: 0.72rem; margin: 2px; }
+      .loading { text-align: center; padding: 80px; color: var(--gris-texte); }
+      .count { font-size: 0.82rem; color: var(--gris-texte); margin-bottom: 24px; }
+    </style>
+  </head>
+  <body>
+
+    <header>
+      <div class="logo">Studio<span>Modèles</span></div>
+      <div class="header-badge">Dashboard Admin</div>
+    </header>
+
+    <div class="dashboard">
+      <h2>Candidatures</h2>
+      <p class="count" id="count">Chargement…</p>
+      <div class="candidatures-grid" id="grid">
+        <p class="loading">Chargement des candidatures…</p>
+      </div>
+    </div>
+
+    <script>
+      async function loadCandidatures() {
+        const grid  = document.getElementById('grid');
+        const count = document.getElementById('count');
+
+        try {
+          const res  = await fetch('/api/candidatures');
+          const json = await res.json();
+
+          if (!json.success) throw new Error();
+
+          const data = json.data;
+          count.textContent = `${data.length} candidature${data.length > 1 ? 's' : 
+  ''}`;
+
+          grid.innerHTML = data.map(c => `
+            <div class="card">
+              <div class="card-photos">
+                <img src="${c.photo_profil_signed || ''}" alt="Profil ${c.prenom}"
+  onclick="window.open(this.src)" />
+                <img src="${c.photo_body_signed   || ''}" alt="Body ${c.prenom}"
+  onclick="window.open(this.src)" />
+              </div>
+              <div class="card-body">
+                <div class="card-name">${c.prenom} ${c.nom}</div>
+                <div class="card-meta">${c.email} · ${c.telephone}</div>
+                <div class="card-info">
+                  <span class="badge">${c.genre || '—'}</span>
+                  <span class="badge">${c.taille ? c.taille + ' cm' : '—'}</span>
+                  <span class="badge">${c.experience || '—'}</span>
+                  <span class="badge">Haut ${c.taille_haut || '—'}</span>
+                  <span class="badge">Bas ${c.taille_bas || '—'}</span>
+                  ${c.instagram ? `<br/><a href="${c.instagram}" target="_blank"
+  style="font-size:0.78rem;color:var(--gris-texte)">${c.instagram}</a>` : ''}
+                </div>
+              </div>
+            </div>
+          `).join('');
+
+        } catch {
+          grid.innerHTML = '<p class="loading">Erreur de chargement.</p>';
+        }
+      }
+
+      loadCandidatures();
+    </script>
+
+  </body>
+  </html>
