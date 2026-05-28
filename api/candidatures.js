@@ -50,7 +50,7 @@ module.exports = async function handler(req,res) {
       );
       const signData = await signRes.json();
       signData.forEach(item => {
-        if (item.signedURL) signedMap[item.path] = `${url}${item.signedURL}`;
+        if (item.signedURL) signedMap[item.path] = `${url}/storage/v1${item.signedURL}`;
       });
     }
 
