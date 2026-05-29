@@ -184,10 +184,12 @@ module.exports = async function handler(req, res) {
     1.0 = très probablement un humain
     Seuil 0.5 = compromis standard en production
   */
+  console.log('reCAPTCHA response:', JSON.stringify(recaptchaJson));
   if (!recaptchaJson.success || recaptchaJson.score < 0.5) {
     return res.status(403).json({
       success: false,
-      message: 'Vérification anti-bot échouée. Réessaie dans quelques instants.'
+      message: 'Vérification anti-bot échouée. Réessaie dans quelques instants.',
+      debug: recaptchaJson
     });
   }
 
