@@ -322,7 +322,7 @@ form.addEventListener('submit', async function(event) {
 
   } catch (err) {
     console.error('Erreur lors de l\'envoi :', err);
-    alert('Une erreur est survenue. Vérifie ta connexion et réessaie.');
+    alert(err.message || 'Une erreur est survenue. Vérifie ta connexion et réessaie.');
     submitBtn.disabled = false;
     submitBtn.textContent = 'Envoyer ma candidature';
   }
