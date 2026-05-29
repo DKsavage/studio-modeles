@@ -54,6 +54,77 @@ async function uploadPhoto(buffer, fileName, supabaseUrl, supabaseKey) {
     return `photos-candidatures/${fileName}`;
 }
 
+async function sendConfirmationEmails(data) {
+    const resendKey = process.env.RESEND_API_KEY;
+
+    /* Email à la candidate */
+    const toCandidate = fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from:    'Studio Modèles <casting@luminamodels.ca>',
+        to:      [data.email],
+        subject: 'Candidature reçue — Studio Modèles',
+        html: `
+          <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; 
+  color: #0a0a0a;">
+            <h1 style="font-weight: 300; font-size: 2rem; margin-bottom: 8px;">Studio 
+  Modèles</h1>
+            <p style="color: #6b6b6b; margin-bottom: 32px;">Agence de mannequinat</p>
+            <p>Bonjour <strong>${data.prenom}</strong>,</p>
+            <p>Nous avons bien reçu ta candidature. Notre équipe va l'examiner avec 
+  soin et te contactera dans les <strong>7 jours ouvrés</strong>.</p>
+            <p style="color: #6b6b6b; font-size: 0.9rem; margin-top: 32px;">L'équipe 
+  Studio Modèles</p>
+          </div>
+        `,
+      }),
+    });
+
+    /* Notification à l'admin */
+    const toAdmin = fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${resendKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from:    'Studio Modèles <casting@luminamodels.ca>',
+        to:      ['bitoungui32@gmail.com'],
+        subject: `Nouvelle candidature — ${data.prenom} ${data.nom}`,
+        html: `
+          <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; 
+  color: #0a0a0a;">
+            <h2 style="font-weight: 300;">Nouvelle candidature reçue</h2>
+            <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
+              <tr><td style="padding: 8px 0; 
+  color:#6b6b6b;">Nom</td><td><strong>${data.prenom} ${data.nom}</strong></td></tr>
+              <tr><td style="padding: 8px 0; 
+  color:#6b6b6b;">Email</td><td>${data.email}</td></tr>
+              <tr><td style="padding: 8px 0; 
+  color:#6b6b6b;">Téléphone</td><td>${data.telephone}</td></tr>
+              <tr><td style="padding: 8px 0; 
+  color:#6b6b6b;">Genre</td><td>${data.genre}</td></tr>
+              <tr><td style="padding: 8px 0; 
+  color:#6b6b6b;">Taille</td><td>${data.taille} cm</td></tr>
+              <tr><td style="padding: 8px 0; 
+  color:#6b6b6b;">Expérience</td><td>${data.experience}</td></tr>
+            </table>
+            <p style="margin-top: 24px;"><a href="https://luminamodels.ca/admin.html" 
+  style="background:#0a0a0a; color:#fff; padding: 12px 24px; text-decoration: none; 
+  font-size: 0.8rem; letter-spacing: 0.1em;">Voir le dashboard →</a></p>
+          </div>
+        `,
+      }),
+    });
+
+    /* Envoie les deux en parallèle */
+    await Promise.all([toCandidate, toAdmin]);
+}
+
 /*
   export default
   Syntaxe Vercel pour déclarer le handler de la route.
@@ -196,6 +267,9 @@ module.exports = async function handler(req, res) {
     const errText = await supabaseRes.text();
     throw new Error(`Supabase: ${supabaseRes.status} — ${errText}`);
   }
+  
+  /* Emails de confirmation — non bloquant */
+  sendConfirmationEmails(data).catch(err => console.error('Email error:', err));
 
   return res.status(200).json({ success: true });
 }
