@@ -21,7 +21,9 @@ module.exports = async function handler(req, res) {
   );
 
   if (!authRes.ok) {
-    return res.status(401).json({ success: false, message: 'Email non reconnu.' });
+    const errBody = await authRes.text();
+    console.error('Supabase OTP error:', authRes.status, errBody);
+    return res.status(401).json({ success: false, message: 'Email non reconnu.', debug: errBody });
   }
 
   return res.status(200).json({ success: true });
