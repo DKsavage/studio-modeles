@@ -21,9 +21,12 @@ module.exports = async function handler(req, res) {
   );
 
   if (!authRes.ok) {
-    const errBody = await authRes.text();
-    console.error('Supabase OTP error:', authRes.status, errBody);
-    return res.status(401).json({ success: false, message: 'Email non reconnu.', debug: errBody });
+    const errBody = await authRes.json().catch(() => ({}));
+    /* Rate limit Supabase free tier (~4 emails/heure) */
+    if (errBody.error_code === 'over_email_send_rate_limit') {
+      return res.status(429).json({ success: false, message: 'Trop de tentatives. Réessaie dans quelques minutes.' });
+    }
+    return res.status(401).json({ success: false, message: 'Email non reconnu.' });
   }
 
   return res.status(200).json({ success: true });
