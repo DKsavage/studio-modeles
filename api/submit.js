@@ -65,20 +65,16 @@ async function sendConfirmationEmails(data) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from:    'Studio Modèles <casting@luminamodels.ca>',
+        from:    'Lumina Photography <casting@luminamodels.ca>',
         to:      [data.email],
-        subject: 'Candidature reçue — Studio Modèles',
+        subject: 'Inscription reçue — Lumina Photography',
         html: `
-          <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; 
-  color: #0a0a0a;">
-            <h1 style="font-weight: 300; font-size: 2rem; margin-bottom: 8px;">Studio 
-  Modèles</h1>
+          <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #0a0a0a;">
+            <h1 style="font-weight: 300; font-size: 2rem; margin-bottom: 8px;">Lumina Photography</h1>
             <p style="color: #6b6b6b; margin-bottom: 32px;">Agence de mannequinat</p>
             <p>Bonjour <strong>${data.prenom}</strong>,</p>
-            <p>Nous avons bien reçu ta candidature. Notre équipe va l'examiner avec 
-  soin et te contactera dans les <strong>7 jours ouvrés</strong>.</p>
-            <p style="color: #6b6b6b; font-size: 0.9rem; margin-top: 32px;">L'équipe 
-  Studio Modèles</p>
+            <p>Tu as bien été enregistré(e) dans notre base de modèles. Nous te contacterons dès qu'un projet correspondant à ton profil se présente.</p>
+            <p style="color: #6b6b6b; font-size: 0.9rem; margin-top: 32px;">L'équipe Lumina Photography</p>
           </div>
         `,
       }),
@@ -92,13 +88,12 @@ async function sendConfirmationEmails(data) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from:    'Studio Modèles <casting@luminamodels.ca>',
+        from:    'Lumina Photography <casting@luminamodels.ca>',
         to:      ['bitoungui32@gmail.com'],
-        subject: `Nouvelle candidature — ${data.prenom} ${data.nom}`,
+        subject: `Nouveau modèle inscrit — ${data.prenom} ${data.nom}`,
         html: `
-          <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; 
-  color: #0a0a0a;">
-            <h2 style="font-weight: 300;">Nouvelle candidature reçue</h2>
+          <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #0a0a0a;">
+            <h2 style="font-weight: 300;">Nouveau modèle inscrit</h2>
             <table style="width:100%; border-collapse: collapse; font-size: 0.9rem;">
               <tr><td style="padding: 8px 0; 
   color:#6b6b6b;">Nom</td><td><strong>${data.prenom} ${data.nom}</strong></td></tr>
