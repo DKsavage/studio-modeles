@@ -37,7 +37,10 @@
 
   <header>
     <div class="logo">Studio<span>Modèles</span></div>
-    <div class="header-badge">Dashboard Admin</div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="header-badge">Dashboard Admin</div>
+      <button onclick="sessionStorage.removeItem('admin_token');window.location.href='/login.html'" style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;background:none;border:1px solid var(--gris-bord);padding:6px 14px;border-radius:20px;cursor:pointer;color:var(--gris-texte);font-family:var(--font-corps);">Déconnexion</button>
+    </div>
   </header>
 
   <div class="dashboard">
@@ -94,6 +97,10 @@
   </div>
 
   <script>
+    /* ── Vérification auth — redirige vers login si pas de token ── */
+    const adminToken = sessionStorage.getItem('admin_token');
+    if (!adminToken) window.location.href = '/login.html';
+
     let allCandidatures = [];
     let activeFilters = { genre: null, experience: null, taille_haut: null, taille_bas: null };
 
@@ -181,7 +188,10 @@
     async function loadCandidatures() {
       const grid = document.getElementById('grid');
       try {
-        const res  = await fetch('/api/candidatures');
+        const res  = await fetch('/api/candidatures', {
+          headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (res.status === 401) { sessionStorage.removeItem('admin_token'); window.location.href = '/login.html'; return; }
         const json = await res.json();
         if (!json.success) throw new Error();
         allCandidatures = json.data;

@@ -6,6 +6,24 @@ module.exports = async function handler(req,res) {
       return res.status(405).json({ success: false });
     }
 
+    /* ── Vérification du token admin ── */
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ success: false, message: 'Non autorisé.' });
+    }
+
+    const accessToken = authHeader.split(' ')[1];
+    const userRes = await fetch(`${process.env.SUPABASE_URL}/auth/v1/user`, {
+      headers: {
+        'apikey':        process.env.SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    });
+
+    if (!userRes.ok) {
+      return res.status(401).json({ success: false, message: 'Session expirée. Reconnecte-toi.' });
+    }
+
     const url = process.env.SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_KEY;
 
