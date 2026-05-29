@@ -65,9 +65,10 @@ async function sendConfirmationEmails(data) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from:    'Lumina Photography <casting@luminamodels.ca>',
-        to:      [data.email],
-        subject: 'Inscription reçue — Lumina Photography',
+        from:     'Lumina Photography <casting@luminamodels.ca>',
+        reply_to: 'bitoungui32@gmail.com',
+        to:       [data.email],
+        subject:  'Inscription reçue — Lumina Photography',
         html: `
           <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #0a0a0a;">
             <h1 style="font-weight: 300; font-size: 2rem; margin-bottom: 8px;">Lumina Photography</h1>

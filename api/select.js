@@ -31,9 +31,10 @@ module.exports = async function handler(req, res) {
       'Content-Type':  'application/json',
     },
     body: JSON.stringify({
-      from:    'Lumina Photography <casting@luminamodels.ca>',
-      to:      [email],
-      subject: 'Félicitations — Tu as été sélectionné(e) par Lumina Photography',
+      from:     'Lumina Photography <casting@luminamodels.ca>',
+      reply_to: 'bitoungui32@gmail.com',
+      to:       [email],
+      subject:  'Félicitations — Tu as été sélectionné(e) par Lumina Photography',
       html: `
         <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #0a0a0a;">
           <h1 style="font-weight: 300; font-size: 2rem; margin-bottom: 8px;">Lumina Photography</h1>
