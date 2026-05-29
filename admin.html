@@ -31,6 +31,10 @@
     .chip.active { background: var(--noir); border-color: var(--noir); color: var(--blanc); }
     .reset-btn { align-self: flex-end; padding: 5px 14px; border: none; background: none; font-size: 0.75rem; color: var(--gris-texte); cursor: pointer; text-decoration: underline; font-family: var(--font-corps); }
     .reset-btn:hover { color: var(--noir); }
+    .btn-select { width: 100%; margin-top: 16px; padding: 10px; border: 1px solid var(--noir); background: none; font-family: var(--font-corps); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; color: var(--noir); transition: all 0.2s ease; }
+    .btn-select:hover { background: var(--noir); color: var(--blanc); }
+    .btn-select:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-select.sent { background: #2d6a4f; border-color: #2d6a4f; color: #fff; }
   </style>
 </head>
 <body>
@@ -149,6 +153,13 @@
               <span class="badge">Bas ${c.taille_bas || '—'}</span>
               ${c.instagram ? `<br/><a href="${c.instagram}" target="_blank" style="font-size:0.78rem;color:var(--gris-texte)">${c.instagram}</a>` : ''}
             </div>
+            <button
+              class="btn-select"
+              data-email="${c.email}"
+              data-prenom="${c.prenom}"
+              data-nom="${c.nom || ''}"
+              onclick="selectModel(this)"
+            >Sélectionner ce modèle</button>
           </div>
         </div>
       `).join('');
@@ -198,6 +209,33 @@
         renderCards(allCandidatures);
       } catch {
         grid.innerHTML = '<p class="loading">Erreur de chargement.</p>';
+      }
+    }
+
+    async function selectModel(btn) {
+      const { email, prenom, nom } = btn.dataset;
+      if (!confirm(`Envoyer l'email de sélection à ${prenom} ${nom} ?`)) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Envoi en cours…';
+
+      try {
+        const res = await fetch('/api/select', {
+          method: 'POST',
+          headers: {
+            'Content-Type':  'application/json',
+            'Authorization': `Bearer ${adminToken}`,
+          },
+          body: JSON.stringify({ email, prenom, nom }),
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message);
+        btn.textContent = 'Email envoyé ✓';
+        btn.classList.add('sent');
+      } catch (err) {
+        alert('Erreur : ' + (err.message || 'réessaie.'));
+        btn.disabled = false;
+        btn.textContent = 'Sélectionner ce modèle';
       }
     }
 
