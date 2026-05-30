@@ -5,6 +5,9 @@
    Version : 1.0
    ═══════════════════════════════════════════════════════════════ */
 
+const currentYear = new Date().getFullYear();
+document.querySelectorAll('#nav-year, #hero-year').forEach(el => { el.textContent = currentYear; });
+
 /* ─────────────────────────────────────────────────────────────
    CONFIGURATION
    APPS_SCRIPT_URL    : URL de l'API Apps Script (déploiement Web App)

@@ -50,7 +50,7 @@
     <div class="flex items-center gap-3">
       <span class="hidden sm:flex items-center gap-1.5 text-xs tracking-widest uppercase text-gray-400">
         <span class="w-1.5 h-1.5 rounded-full bg-rouge animate-pulse"></span>
-        Open Call 2025
+        Open Call <span id="nav-year"></span>
       </span>
       <a href="#modelForm" class="font-corps text-xs tracking-widest uppercase bg-rouge text-white px-4 py-2 rounded-full hover:bg-rouge-dark transition-colors duration-200 no-underline">
         Postuler
@@ -58,46 +58,34 @@
     </div>
   </header>
 
-  <div class="hero">
+  <div class="hero pt-32 pb-28 relative overflow-hidden">
 
-    <!-- Ligne rouge verticale décorative -->
-    <div class="w-px h-12 bg-rouge mx-auto mb-6"></div>
-
-    <!-- Label pill -->
-    <div class="inline-flex items-center gap-2 border border-rouge/30 rounded-full px-4 py-1.5 mb-8">
-      <span class="w-1 h-1 rounded-full bg-rouge"></span>
-      <span class="text-rouge text-xs tracking-widest uppercase">Photographes · Créateurs de contenu</span>
-      <span class="w-1 h-1 rounded-full bg-rouge"></span>
+    <!-- Watermark "LUMINA" en fond — très subtil, donne de la profondeur -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+      <span class="font-titre font-bold text-white/[0.035] whitespace-nowrap tracking-[0.2em]"
+            style="font-size: clamp(7rem, 20vw, 15rem);">LUMINA</span>
     </div>
 
-    <!-- Titre -->
-    <h1>Soumettez votre<br /><em>profil créatif</em></h1>
+    <!-- Contenu par-dessus le watermark -->
+    <div class="relative z-10">
 
-    <!-- Séparateur -->
-    <div class="w-10 h-px bg-rouge/40 mx-auto mt-6"></div>
+      <!-- Label épuré -->
+      <p class="text-xs tracking-[0.4em] uppercase text-rouge/70 mb-12">
+        Photographes &nbsp;·&nbsp; Créateurs de contenu
+      </p>
 
-    <!-- Description -->
-    <p class="mt-6 text-white/50 text-sm leading-loose max-w-xs mx-auto">
-      Rejoignez le réseau Lumina Photography. Nous vous contacterons dès qu'un projet correspond à votre profil.
-    </p>
+      <!-- Titre principal -->
+      <h1>Soumettez votre<br /><em>profil créatif</em></h1>
 
-    <!-- Barre d'infos éditoriale -->
-    <div class="flex items-center justify-center gap-8 mt-10 pt-8 border-t border-white/10 max-w-xs mx-auto">
-      <div class="text-center">
-        <div class="font-titre text-white text-lg font-light">Mtl</div>
-        <div class="text-white/30 text-xs tracking-widest uppercase mt-0.5">Montréal</div>
-      </div>
-      <div class="w-px h-7 bg-white/10"></div>
-      <div class="text-center">
-        <div class="font-titre text-white text-lg font-light">2025</div>
-        <div class="text-white/30 text-xs tracking-widest uppercase mt-0.5">Open Call</div>
-      </div>
-      <div class="w-px h-7 bg-white/10"></div>
-      <div class="text-center">
-        <div class="font-titre text-rouge text-lg font-light">Lumina</div>
-        <div class="text-white/30 text-xs tracking-widest uppercase mt-0.5">Photography</div>
-      </div>
+      <!-- Description minimaliste -->
+      <p class="mt-8 text-white/40 text-sm leading-loose max-w-xs mx-auto">
+        Nous vous contacterons dès qu'un projet correspond à votre profil.
+      </p>
+
     </div>
+
+    <!-- Année discrète en bas à droite -->
+    <span class="absolute bottom-5 right-8 text-white/20 text-xs tracking-widest" id="hero-year"></span>
 
   </div>
 
