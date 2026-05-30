@@ -21,12 +21,50 @@
   </header>
 
   <div class="dashboard">
-    <div class="flex items-baseline justify-between mb-2">
+
+    <div class="flex items-baseline justify-between mb-6">
       <h2>Candidatures</h2>
       <p class="count" id="count">Chargement…</p>
     </div>
 
-    <input type="search" id="search" class="search-input" placeholder="Rechercher par nom, email…" />
+    <!-- ① Stats animées -->
+    <div class="stats-bar">
+      <div class="stat-block">
+        <span class="stat-num" id="stat-total">—</span>
+        <span class="stat-label">total</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-block">
+        <span class="stat-num" id="stat-femmes">—</span>
+        <span class="stat-label">femmes</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-block">
+        <span class="stat-num" id="stat-hommes">—</span>
+        <span class="stat-label">hommes</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-block">
+        <span class="stat-num stat-num-text" id="stat-exp">—</span>
+        <span class="stat-label">expérience dominante</span>
+      </div>
+    </div>
+
+    <!-- ⑤ Recherche avec icône loupe → X -->
+    <div class="search-wrapper" id="search-wrapper">
+      <span class="search-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 10l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <input type="search" id="search" class="search-input" placeholder="Rechercher par nom, email…" autocomplete="off" />
+      <button class="search-clear" id="search-clear" aria-label="Effacer">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
 
     <div class="filters">
       <div class="filter-group">
@@ -68,26 +106,40 @@
         </div>
       </div>
       <button class="reset-btn" id="reset">Réinitialiser</button>
+
+      <!-- ⑥ Toggle grille / liste -->
+      <div class="view-toggle">
+        <button class="view-btn active" id="btn-grid" title="Vue grille">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <rect x="0.5" y="0.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="8.5" y="0.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="0.5" y="8.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="8.5" y="8.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </button>
+        <button class="view-btn" id="btn-list" title="Vue liste">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M0.5 2.5h13M0.5 7h13M0.5 11.5h13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div class="candidatures-grid" id="grid"></div>
   </div>
 
   <script>
-    /* ── Vérification auth — redirige vers login si pas de token ── */
     const adminToken = sessionStorage.getItem('admin_token');
     if (!adminToken) window.location.href = '/login.html';
 
     let allCandidatures = [];
     let activeFilters = { genre: null, experience: null, taille_haut: null, taille_bas: null };
 
+    /* ── ③ Skeleton ───────────────────────────────────────── */
     function renderSkeleton() {
       document.getElementById('grid').innerHTML = Array(6).fill('').map(() => `
         <div class="skeleton-card">
-          <div class="skeleton-photos">
-            <div class="skeleton-block"></div>
-            <div class="skeleton-block"></div>
-          </div>
+          <div class="skeleton-block" style="aspect-ratio:3/4;width:100%"></div>
           <div class="skeleton-body">
             <div class="skeleton-block skeleton-line" style="width:55%"></div>
             <div class="skeleton-block skeleton-line" style="width:80%"></div>
@@ -96,27 +148,23 @@
         </div>
       `).join('');
     }
-
     renderSkeleton();
 
+    /* ── Filtres ────────────────────────────────────────────── */
     function applyFilters() {
       const q = document.getElementById('search').value.toLowerCase().trim();
-
       const filtered = allCandidatures.filter(c => {
-        const matchSearch = !q ||
-          `${c.prenom} ${c.nom} ${c.email}`.toLowerCase().includes(q);
-
+        const matchSearch     = !q || `${c.prenom} ${c.nom} ${c.email}`.toLowerCase().includes(q);
         const matchGenre      = !activeFilters.genre      || c.genre      === activeFilters.genre;
         const matchExperience = !activeFilters.experience || c.experience === activeFilters.experience;
         const matchHaut       = !activeFilters.taille_haut|| c.taille_haut=== activeFilters.taille_haut;
         const matchBas        = !activeFilters.taille_bas || c.taille_bas === activeFilters.taille_bas;
-
         return matchSearch && matchGenre && matchExperience && matchHaut && matchBas;
       });
-
       renderCards(filtered);
     }
 
+    /* ── ① Cards portrait + ② stagger ──────────────────────── */
     function renderCards(data) {
       const grid = document.getElementById('grid');
       document.getElementById('count').textContent =
@@ -127,29 +175,43 @@
         return;
       }
 
-      grid.innerHTML = data.map(c => `
-        <div class="card group">
-          <div class="card-photos overflow-hidden">
+      grid.innerHTML = data.map((c, i) => `
+        <div class="card" style="animation-delay:${i * 50}ms">
+
+          <!-- Photo portrait plein-cadre + overlay + crossfade -->
+          <div class="card-photos-portrait">
             <img src="${c.photo_profil_signed || ''}" alt="Profil ${c.prenom}"
-                 onclick="window.open(this.src)"
-                 class="transition-transform duration-500 ease-out group-hover:scale-105 cursor-zoom-in" />
-            <img src="${c.photo_body_signed   || ''}" alt="Body ${c.prenom}"
-                 onclick="window.open(this.src)"
-                 class="transition-transform duration-500 ease-out group-hover:scale-105 cursor-zoom-in" />
-          </div>
-          <div class="card-body">
-            <div class="card-name">${c.prenom} ${c.nom}</div>
-            <div class="card-meta">${c.email} · ${c.telephone}</div>
-            <div class="card-info">
-              <div class="flex flex-wrap gap-1 mb-2">
-                <span class="badge">${c.genre || '—'}</span>
-                <span class="badge">${c.taille ? c.taille + ' cm' : '—'}</span>
-                <span class="badge">${c.experience || '—'}</span>
-                <span class="badge">Haut ${c.taille_haut || '—'}</span>
-                <span class="badge">Bas ${c.taille_bas || '—'}</span>
+                 class="card-photo-main" onclick="window.open(this.src)" />
+            <img src="${c.photo_body_signed   || ''}" alt="Corps ${c.prenom}"
+                 class="card-photo-hover" onclick="window.open(this.src)" />
+
+            <!-- Gradient overlay avec nom + badges -->
+            <div class="card-glass-overlay">
+              <div class="card-name-overlay">${c.prenom} ${c.nom}</div>
+              <div class="flex flex-wrap gap-1 mt-1">
+                ${c.genre      ? `<span class="badge-glass">${c.genre}</span>`      : ''}
+                ${c.taille     ? `<span class="badge-glass">${c.taille} cm</span>`  : ''}
+                ${c.experience ? `<span class="badge-glass">${c.experience}</span>` : ''}
               </div>
-              ${c.instagram ? `<a href="${c.instagram}" target="_blank" class="text-xs text-gray-400 hover:text-rouge transition-colors duration-200 break-all">${c.instagram}</a>` : ''}
             </div>
+
+            <!-- ③ Overlay sélection -->
+            <div class="selected-overlay"></div>
+            <div class="selected-badge">✓ Sélectionné</div>
+          </div>
+
+          <!-- Infos sous la photo -->
+          <div class="card-body-minimal">
+            <div class="card-name card-name-list">${c.prenom} ${c.nom}</div>
+            <div class="card-meta">${c.email} · ${c.telephone}</div>
+            <div class="flex flex-wrap gap-1 mt-2 mb-3">
+              <span class="badge">Haut ${c.taille_haut || '—'}</span>
+              <span class="badge">Bas ${c.taille_bas   || '—'}</span>
+            </div>
+            ${c.instagram
+              ? `<a href="${c.instagram}" target="_blank"
+                   class="text-xs text-gray-400 hover:text-rouge transition-colors duration-200 break-all block mb-3">${c.instagram}</a>`
+              : ''}
             <button
               class="btn-select"
               data-email="${c.email}"
@@ -158,58 +220,118 @@
               onclick="selectModel(this)"
             >Sélectionner ce modèle</button>
           </div>
+
         </div>
       `).join('');
     }
 
-    /* Chips — toggle actif/inactif */
+    /* ── ④ Stats count-up ───────────────────────────────────── */
+    function countUp(el, target, duration = 900) {
+      const start = performance.now();
+      function step(now) {
+        const p = Math.min((now - start) / duration, 1);
+        el.textContent = Math.floor(p * target);
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(step);
+    }
+
+    function updateStats(data) {
+      const femmes = data.filter(c => c.genre === 'Femme').length;
+      const hommes = data.filter(c => c.genre === 'Homme').length;
+
+      const expCount = {};
+      data.forEach(c => {
+        if (c.experience) expCount[c.experience] = (expCount[c.experience] || 0) + 1;
+      });
+      const topExp = Object.entries(expCount).sort((a, b) => b[1] - a[1])[0];
+
+      countUp(document.getElementById('stat-total'),  data.length);
+      countUp(document.getElementById('stat-femmes'), femmes);
+      countUp(document.getElementById('stat-hommes'), hommes);
+      document.getElementById('stat-exp').textContent = topExp ? topExp[0] : '—';
+    }
+
+    /* ── Chips filtres ──────────────────────────────────────── */
     document.querySelectorAll('.chip').forEach(chip => {
-      chip.addEventListener('click', function() {
+      chip.addEventListener('click', function () {
         const filter = this.dataset.filter;
         const value  = this.dataset.value;
-
         if (activeFilters[filter] === value) {
-          /* Déjà actif → désactiver */
           activeFilters[filter] = null;
           this.classList.remove('active');
         } else {
-          /* Activer ce chip, désactiver les autres du même groupe */
           document.querySelectorAll(`[data-filter="${filter}"]`).forEach(c => c.classList.remove('active'));
           activeFilters[filter] = value;
           this.classList.add('active');
         }
-
         applyFilters();
       });
     });
 
-    /* Réinitialiser tous les filtres */
-    document.getElementById('reset').addEventListener('click', function() {
+    document.getElementById('reset').addEventListener('click', function () {
       activeFilters = { genre: null, experience: null, taille_haut: null, taille_bas: null };
       document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       document.getElementById('search').value = '';
+      document.getElementById('search-wrapper').classList.remove('has-value');
       renderCards(allCandidatures);
     });
 
-    document.getElementById('search').addEventListener('input', applyFilters);
+    /* ── ⑤ Recherche — loupe → X ────────────────────────────── */
+    const searchInput   = document.getElementById('search');
+    const searchWrapper = document.getElementById('search-wrapper');
 
+    searchInput.addEventListener('input', function () {
+      searchWrapper.classList.toggle('has-value', !!this.value);
+      applyFilters();
+    });
+
+    document.getElementById('search-clear').addEventListener('click', function () {
+      searchInput.value = '';
+      searchWrapper.classList.remove('has-value');
+      searchInput.focus();
+      applyFilters();
+    });
+
+    /* ── ⑥ Toggle grille / liste ────────────────────────────── */
+    document.getElementById('btn-grid').addEventListener('click', function () {
+      document.getElementById('grid').classList.remove('list-view');
+      this.classList.add('active');
+      document.getElementById('btn-list').classList.remove('active');
+    });
+
+    document.getElementById('btn-list').addEventListener('click', function () {
+      document.getElementById('grid').classList.add('list-view');
+      this.classList.add('active');
+      document.getElementById('btn-grid').classList.remove('active');
+    });
+
+    /* ── Chargement API ─────────────────────────────────────── */
     async function loadCandidatures() {
       const grid = document.getElementById('grid');
       try {
         const res  = await fetch('/api/candidatures', {
           headers: { 'Authorization': `Bearer ${adminToken}` }
         });
-        if (res.status === 401) { sessionStorage.removeItem('admin_token'); window.location.href = '/login.html'; return; }
+        if (res.status === 401) {
+          sessionStorage.removeItem('admin_token');
+          window.location.href = '/login.html';
+          return;
+        }
         const json = await res.json();
         if (!json.success) throw new Error();
         allCandidatures = json.data;
         renderCards(allCandidatures);
+        updateStats(allCandidatures);
       } catch {
         grid.innerHTML = '<p class="loading">Erreur de chargement.</p>';
       }
     }
 
+    /* ── ③ Sélectionner — transformation de la carte ────────── */
     async function selectModel(btn) {
+      const card = btn.closest('.card');
       const { email, prenom, nom } = btn.dataset;
       if (!confirm(`Envoyer l'email de sélection à ${prenom} ${nom} ?`)) return;
 
@@ -229,6 +351,7 @@
         if (!json.success) throw new Error(json.message);
         btn.textContent = 'Email envoyé ✓';
         btn.classList.add('sent');
+        card.classList.add('is-selected');
       } catch (err) {
         alert('Erreur : ' + (err.message || 'réessaie.'));
         btn.disabled = false;

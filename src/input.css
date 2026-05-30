@@ -464,17 +464,25 @@
     gap: 24px;
   }
 
+  /* ── CARD — stagger d'entrée au chargement ─────────────── */
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   .card {
     border: 1px solid var(--gris-bord);
     border-radius: 10px;
     overflow: hidden;
     background: var(--blanc);
-    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+    animation: card-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .card:hover {
-    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+    transform: translateY(-3px);
+    border-color: transparent;
   }
 
   .card-photos {
@@ -524,6 +532,276 @@
 
   .loading { text-align: center; padding: 80px; color: var(--gris-texte); }
   .count { font-size: 0.82rem; color: var(--gris-texte); margin-bottom: 12px; }
+
+  /* ── ④ STATS BAR ────────────────────────────────────────── */
+  .stats-bar {
+    display: flex;
+    align-items: center;
+    background: var(--gris-clair);
+    border-radius: 14px;
+    padding: 18px 28px;
+    margin-bottom: 28px;
+    gap: 0;
+  }
+
+  .stat-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 60px;
+  }
+
+  .stat-num {
+    font-family: var(--font-titre);
+    font-size: 2.2rem;
+    font-weight: 300;
+    color: var(--noir);
+    line-height: 1;
+  }
+
+  .stat-num-text {
+    font-family: var(--font-corps);
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  .stat-label {
+    font-size: 0.63rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gris-texte);
+  }
+
+  .stat-sep {
+    width: 1px;
+    height: 36px;
+    background: var(--gris-bord);
+    flex-shrink: 0;
+    margin: 0 4px;
+  }
+
+  /* ── ⑤ SEARCH WRAPPER ───────────────────────────────────── */
+  .search-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gris-texte);
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    display: flex;
+  }
+
+  .search-wrapper .search-input {
+    margin-bottom: 0;
+    padding-left: 42px;
+    padding-right: 40px;
+  }
+
+  .search-clear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gris-texte);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s ease;
+  }
+
+  .search-clear:hover { color: var(--rouge); }
+  .search-wrapper.has-value .search-clear { display: flex; }
+  .search-wrapper.has-value .search-icon { opacity: 0.3; }
+
+  /* ── ⑥ VIEW TOGGLE ──────────────────────────────────────── */
+  .view-toggle {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+    align-self: flex-end;
+  }
+
+  .view-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--gris-bord);
+    border-radius: 6px;
+    background: var(--blanc);
+    cursor: pointer;
+    color: var(--gris-texte);
+    transition: all 0.2s ease;
+  }
+
+  .view-btn:hover { border-color: var(--rouge); color: var(--rouge); }
+  .view-btn.active { background: var(--rouge); border-color: var(--rouge); color: #fff; }
+
+  /* ── ① CARD PORTRAIT PLEIN-CADRE ────────────────────────── */
+  .card-photos-portrait {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    background: var(--gris-clair);
+    overflow: hidden;
+  }
+
+  .card-photo-main,
+  .card-photo-hover {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    cursor: zoom-in;
+  }
+
+  /* Crossfade vers la 2ème photo au hover */
+  .card-photo-hover {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .card:hover .card-photo-hover { opacity: 1; }
+
+  /* Gradient overlay + nom + badges sur la photo */
+  .card-glass-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 48px 14px 14px;
+    background: linear-gradient(
+      to top,
+      rgba(10, 10, 10, 0.92) 0%,
+      rgba(10, 10, 10, 0.5)  55%,
+      transparent            100%
+    );
+    transition: padding-bottom 0.3s ease;
+  }
+
+  .card:hover .card-glass-overlay { padding-bottom: 18px; }
+
+  .card-name-overlay {
+    font-family: var(--font-titre);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+
+  .badge-glass {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.13);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 20px;
+    padding: 2px 8px;
+    font-size: 0.67rem;
+    color: rgba(255, 255, 255, 0.88);
+    letter-spacing: 0.03em;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ── ③ ÉTAT SÉLECTIONNÉ — transformation carte complète ─── */
+  .selected-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(45, 106, 79, 0);
+    pointer-events: none;
+    transition: background 0.5s ease;
+    z-index: 2;
+  }
+
+  .card.is-selected .selected-overlay { background: rgba(45, 106, 79, 0.32); }
+
+  .selected-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: #2d6a4f;
+    color: #fff;
+    font-family: var(--font-corps);
+    font-size: 0.67rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.35s ease 0.1s, transform 0.35s ease 0.1s;
+    z-index: 3;
+  }
+
+  .card.is-selected .selected-badge { opacity: 1; transform: translateY(0); }
+  .card.is-selected .card-name-overlay { color: #a8dabc; }
+  .card.is-selected { border-color: rgba(45, 106, 79, 0.3); }
+
+  /* Card body sous la photo */
+  .card-body-minimal { padding: 14px 16px 18px; }
+
+  /* Nom caché en grille (il est dans l'overlay) — visible en liste */
+  .card-name-list { display: none; }
+
+  /* ── ⑥ VUE LISTE ────────────────────────────────────────── */
+  .candidatures-grid.list-view {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .candidatures-grid.list-view .card {
+    display: flex;
+    flex-direction: row;
+    border-radius: 8px;
+    animation: none;
+  }
+
+  .candidatures-grid.list-view .card-photos-portrait {
+    width: 72px;
+    flex-shrink: 0;
+    aspect-ratio: unset;
+    height: auto;
+    min-height: 90px;
+    border-radius: 0;
+  }
+
+  .candidatures-grid.list-view .card-glass-overlay { display: none; }
+  .candidatures-grid.list-view .card-photo-hover { display: none; }
+  .candidatures-grid.list-view .card-name-list { display: block; font-size: 1rem; margin-bottom: 2px; }
+
+  .candidatures-grid.list-view .card-body-minimal {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+    padding: 12px 16px;
+  }
+
+  .candidatures-grid.list-view .card-meta { margin-bottom: 0; }
+
+  .candidatures-grid.list-view .btn-select {
+    margin-top: 0;
+    width: auto;
+    padding: 8px 16px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
 
   /* ── SKELETON SHIMMER ───────────────────────────────────── */
   @keyframes shimmer {
@@ -922,6 +1200,7 @@
     transform: none !important;
   }
   .blob-1, .blob-2 { animation: none !important; }
+  .card { animation: none !important; opacity: 1 !important; transform: none !important; }
   *,
   *::before,
   *::after {
