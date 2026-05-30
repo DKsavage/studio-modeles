@@ -6,69 +6,75 @@
   <title>Lumina Photography — Connexion</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <style>
-    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; gap: 0; }
-  </style>
 </head>
-<body>
+<body class="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
 
-  <header style="width:100%;">
+  <!-- Logo au-dessus de la carte -->
+  <div class="mb-8 text-center">
     <div class="logo">Lumina<span>Photography</span></div>
-    <div class="header-badge">Espace Admin</div>
-  </header>
+    <p class="text-xs tracking-widest uppercase text-gray-400 mt-2">Espace administrateur</p>
+  </div>
 
-  <div class="login-box">
-    <div class="login-title">Connexion</div>
-    <div class="login-subtitle">Accès réservé aux administrateurs</div>
+  <!-- Carte login -->
+  <div class="w-full max-w-sm bg-white rounded-2xl shadow-xl overflow-hidden">
 
-    <div class="tabs">
-      <button class="tab active" data-tab="otp">Code par email</button>
-      <button class="tab" data-tab="password">Mot de passe</button>
-    </div>
+    <!-- Ligne rouge signature Lumina -->
+    <div class="h-1 w-full bg-rouge"></div>
 
-    <!-- ── ONGLET OTP ── -->
-    <div class="tab-panel active" id="panel-otp">
+    <div class="p-10">
+      <div class="login-title">Connexion</div>
+      <div class="login-subtitle">Accès réservé aux administrateurs</div>
 
-      <!-- Étape 1 : saisir l'email -->
-      <div class="otp-step1" id="otp-step1">
-        <div class="field">
-          <label for="otp-email">Adresse email</label>
-          <input type="email" id="otp-email" placeholder="admin@studiomodeles.com" />
+      <!-- Onglets -->
+      <div class="tabs">
+        <button class="tab active" data-tab="otp">Code par email</button>
+        <button class="tab" data-tab="password">Mot de passe</button>
+      </div>
+
+      <!-- ── ONGLET OTP ── -->
+      <div class="tab-panel active" id="panel-otp">
+
+        <div class="otp-step1" id="otp-step1">
+          <div class="field">
+            <label for="otp-email">Adresse email</label>
+            <input type="email" id="otp-email" placeholder="admin@luminamodels.ca" />
+          </div>
+          <button class="btn" id="btn-send-otp">Recevoir mon code</button>
         </div>
-        <button class="btn" id="btn-send-otp">Recevoir mon code</button>
-      </div>
 
-      <!-- Étape 2 : saisir le code reçu -->
-      <div class="otp-step2" id="otp-step2">
-        <p class="msg-info">Code envoyé à <strong id="otp-email-display"></strong>. Vérifie ta boîte mail.</p>
-        <div class="field">
-          <label for="otp-code">Code à 6 chiffres</label>
-          <input type="text" id="otp-code" class="code-input" placeholder="000000" maxlength="6" inputmode="numeric" />
+        <div class="otp-step2" id="otp-step2">
+          <p class="msg-info">Code envoyé à <strong id="otp-email-display"></strong>. Vérifie ta boîte mail.</p>
+          <div class="field">
+            <label for="otp-code">Code à 6 chiffres</label>
+            <input type="text" id="otp-code" class="code-input" placeholder="000000" maxlength="6" inputmode="numeric" />
+          </div>
+          <button class="btn" id="btn-verify-otp">Connexion</button>
+          <button class="btn btn-secondary" id="btn-resend">Renvoyer le code</button>
         </div>
-        <button class="btn" id="btn-verify-otp">Connexion</button>
-        <button class="btn btn-secondary" id="btn-resend">Renvoyer le code</button>
+
+        <p class="msg-error" id="otp-error"></p>
       </div>
 
-      <p class="msg-error" id="otp-error"></p>
-    </div>
-
-    <!-- ── ONGLET MOT DE PASSE ── -->
-    <div class="tab-panel" id="panel-password">
-      <div class="field">
-        <label for="pw-email">Adresse email</label>
-        <input type="email" id="pw-email" placeholder="admin@studiomodeles.com" />
+      <!-- ── ONGLET MOT DE PASSE ── -->
+      <div class="tab-panel" id="panel-password">
+        <div class="field">
+          <label for="pw-email">Adresse email</label>
+          <input type="email" id="pw-email" placeholder="admin@luminamodels.ca" />
+        </div>
+        <div class="field">
+          <label for="pw-password">Mot de passe</label>
+          <input type="password" id="pw-password" placeholder="••••••••" />
+        </div>
+        <button class="btn" id="btn-login">Se connecter</button>
+        <p class="msg-error" id="pw-error"></p>
       </div>
-      <div class="field">
-        <label for="pw-password">Mot de passe</label>
-        <input type="password" id="pw-password" placeholder="••••••••" />
-      </div>
-      <button class="btn" id="btn-login">Se connecter</button>
-      <p class="msg-error" id="pw-error"></p>
     </div>
   </div>
 
+  <!-- Lien discret -->
+  <p class="mt-6 text-xs text-gray-300 tracking-widest">luminamodels.ca</p>
+
   <script>
-    /* ── Navigation entre onglets ── */
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', function() {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -93,7 +99,6 @@
       window.location.href = '/admin.html';
     }
 
-    /* ── OTP — Étape 1 : envoyer le code ── */
     async function sendOtp() {
       const email = document.getElementById('otp-email').value.trim();
       if (!email) return showError('otp-error', 'Saisis ton email.');
@@ -117,13 +122,11 @@
         return showError('otp-error', json.message || 'Erreur.');
       }
 
-      /* Passer à l'étape 2 */
       document.getElementById('otp-email-display').textContent = email;
       document.getElementById('otp-step1').classList.add('hidden');
       document.getElementById('otp-step2').classList.add('visible');
     }
 
-    /* ── OTP — Étape 2 : vérifier le code ── */
     async function verifyOtp() {
       const email = document.getElementById('otp-email').value.trim();
       const token = document.getElementById('otp-code').value.trim();
@@ -156,12 +159,10 @@
       hideError('otp-error');
     });
 
-    /* Appuyer Entrée sur le code → vérifier */
     document.getElementById('otp-code').addEventListener('keydown', e => {
       if (e.key === 'Enter') verifyOtp();
     });
 
-    /* ── Mot de passe ── */
     document.getElementById('btn-login').addEventListener('click', async function() {
       const email    = document.getElementById('pw-email').value.trim();
       const password = document.getElementById('pw-password').value;
@@ -171,7 +172,7 @@
       this.disabled = true;
       this.textContent = 'Connexion…';
 
-      const res  = await fetch('/api/login', {
+      const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
