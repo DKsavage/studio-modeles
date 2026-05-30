@@ -70,9 +70,7 @@
       <button class="reset-btn" id="reset">Réinitialiser</button>
     </div>
 
-    <div class="candidatures-grid" id="grid">
-      <p class="loading">Chargement des candidatures…</p>
-    </div>
+    <div class="candidatures-grid" id="grid"></div>
   </div>
 
   <script>
@@ -82,6 +80,24 @@
 
     let allCandidatures = [];
     let activeFilters = { genre: null, experience: null, taille_haut: null, taille_bas: null };
+
+    function renderSkeleton() {
+      document.getElementById('grid').innerHTML = Array(6).fill('').map(() => `
+        <div class="skeleton-card">
+          <div class="skeleton-photos">
+            <div class="skeleton-block"></div>
+            <div class="skeleton-block"></div>
+          </div>
+          <div class="skeleton-body">
+            <div class="skeleton-block skeleton-line" style="width:55%"></div>
+            <div class="skeleton-block skeleton-line" style="width:80%"></div>
+            <div class="skeleton-block skeleton-line" style="width:40%"></div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    renderSkeleton();
 
     function applyFilters() {
       const q = document.getElementById('search').value.toLowerCase().trim();

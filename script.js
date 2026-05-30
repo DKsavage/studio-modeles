@@ -8,6 +8,21 @@
 const currentYear = new Date().getFullYear();
 document.querySelectorAll('#nav-year, #hero-year').forEach(el => { el.textContent = currentYear; });
 
+/* ── SCROLL REVEAL — chaque section apparaît au scroll ──────── */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('revealed');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.form-section').forEach((el, i) => {
+  el.style.transitionDelay = `${i * 0.07}s`;
+  revealObserver.observe(el);
+});
+
 /* ─────────────────────────────────────────────────────────────
    CONFIGURATION
    APPS_SCRIPT_URL    : URL de l'API Apps Script (déploiement Web App)
