@@ -851,13 +851,13 @@
   /* ── OTP — 6 cases individuelles ───────────────────────── */
   .otp-boxes {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     justify-content: center;
     margin: 4px 0 4px;
   }
   .otp-box {
-    width: 44px;
-    height: 52px;
+    width: 36px;
+    height: 48px;
     text-align: center;
     font-size: 1.5rem;
     font-weight: 600;

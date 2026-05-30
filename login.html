@@ -50,10 +50,12 @@
         </div>
 
         <div class="otp-step2" id="otp-step2">
-          <p class="msg-info">Code envoyé à <strong id="otp-email-display"></strong>. Vérifie ta boîte mail.</p>
+          <p class="msg-info">Code à 8 chiffres envoyé à <strong id="otp-email-display"></strong>. Vérifie ta boîte mail.</p>
           <div class="field">
-            <label>Code à 6 chiffres</label>
+            <label>Code à 8 chiffres</label>
             <div class="otp-boxes" id="otp-boxes">
+              <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
+              <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
               <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
               <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
               <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
@@ -201,7 +203,7 @@
     async function verifyOtp() {
       const email = document.getElementById('otp-email').value.trim();
       const token = [...otpBoxes].map(b => b.value).join('');
-      if (token.length < 6) return showError('otp-error', 'Saisis les 6 chiffres.');
+      if (token.length < 8) return showError('otp-error', 'Saisis les 8 chiffres.');
       hideError('otp-error');
 
       const btn = document.getElementById('btn-verify-otp');
