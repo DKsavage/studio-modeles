@@ -9,14 +9,20 @@
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
 
+  <!-- Blobs rouge flottants en arrière-plan -->
+  <div class="login-blobs" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
   <!-- Logo au-dessus de la carte -->
-  <div class="mb-8 text-center">
+  <div class="mb-8 text-center relative z-10 login-logo-enter">
     <div class="logo">Lumina<span>Photography</span></div>
     <p class="text-xs tracking-widest uppercase text-gray-400 mt-2">Espace administrateur</p>
   </div>
 
   <!-- Carte login -->
-  <div class="w-full max-w-sm bg-white rounded-2xl shadow-xl overflow-hidden">
+  <div class="w-full max-w-sm bg-white rounded-2xl shadow-xl overflow-hidden relative z-10 login-card-enter">
 
     <!-- Ligne rouge signature Lumina -->
     <div class="h-1 w-full bg-rouge"></div>
@@ -29,6 +35,7 @@
       <div class="tabs">
         <button class="tab active" data-tab="otp">Code par email</button>
         <button class="tab" data-tab="password">Mot de passe</button>
+        <span class="tab-ink"></span>
       </div>
 
       <!-- ── ONGLET OTP ── -->
@@ -37,7 +44,7 @@
         <div class="otp-step1" id="otp-step1">
           <div class="field">
             <label for="otp-email">Adresse email</label>
-            <input type="email" id="otp-email" placeholder="admin@luminamodels.ca" />
+            <input type="email" id="otp-email" placeholder="admin@luminamodels.ca" autocomplete="email" />
           </div>
           <button class="btn" id="btn-send-otp">Recevoir mon code</button>
         </div>
@@ -45,8 +52,15 @@
         <div class="otp-step2" id="otp-step2">
           <p class="msg-info">Code envoyé à <strong id="otp-email-display"></strong>. Vérifie ta boîte mail.</p>
           <div class="field">
-            <label for="otp-code">Code à 6 chiffres</label>
-            <input type="text" id="otp-code" class="code-input" placeholder="000000" maxlength="6" inputmode="numeric" />
+            <label>Code à 6 chiffres</label>
+            <div class="otp-boxes" id="otp-boxes">
+              <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
+              <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
+              <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
+              <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
+              <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
+              <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off" />
+            </div>
           </div>
           <button class="btn" id="btn-verify-otp">Connexion</button>
           <button class="btn btn-secondary" id="btn-resend">Renvoyer le code</button>
@@ -59,11 +73,11 @@
       <div class="tab-panel" id="panel-password">
         <div class="field">
           <label for="pw-email">Adresse email</label>
-          <input type="email" id="pw-email" placeholder="admin@luminamodels.ca" />
+          <input type="email" id="pw-email" placeholder="admin@luminamodels.ca" autocomplete="email" />
         </div>
         <div class="field">
           <label for="pw-password">Mot de passe</label>
-          <input type="password" id="pw-password" placeholder="••••••••" />
+          <input type="password" id="pw-password" placeholder="••••••••" autocomplete="current-password" />
         </div>
         <button class="btn" id="btn-login">Se connecter</button>
         <p class="msg-error" id="pw-error"></p>
@@ -72,26 +86,43 @@
   </div>
 
   <!-- Lien discret -->
-  <p class="mt-6 text-xs text-gray-300 tracking-widest">luminamodels.ca</p>
+  <p class="mt-6 text-xs text-gray-300 tracking-widest relative z-10">luminamodels.ca</p>
 
   <script>
+    /* ── Tab indicator glissant ─────────────────────────────── */
+    const tabInk = document.querySelector('.tab-ink');
+
+    function moveTabInk(tab) {
+      if (!tabInk) return;
+      tabInk.style.left  = tab.offsetLeft + 'px';
+      tabInk.style.width = tab.offsetWidth + 'px';
+    }
+
+    /* Position initiale sur l'onglet actif */
+    const firstActiveTab = document.querySelector('.tab.active');
+    if (firstActiveTab) moveTabInk(firstActiveTab);
+
     document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', function() {
+      tab.addEventListener('click', function () {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         this.classList.add('active');
         document.getElementById(`panel-${this.dataset.tab}`).classList.add('active');
+        moveTabInk(this);
       });
     });
 
+    /* ── Erreurs avec animation shake ──────────────────────── */
     function showError(id, msg) {
       const el = document.getElementById(id);
       el.textContent = msg;
-      el.classList.add('visible');
+      el.classList.remove('shake');
+      void el.offsetWidth; /* reflow pour relancer l'animation */
+      el.classList.add('visible', 'shake');
     }
 
     function hideError(id) {
-      document.getElementById(id).classList.remove('visible');
+      document.getElementById(id).classList.remove('visible', 'shake');
     }
 
     function saveAndRedirect(token) {
@@ -99,6 +130,44 @@
       window.location.href = '/admin.html';
     }
 
+    /* ── OTP — 6 cases avec auto-avance ────────────────────── */
+    const otpBoxes = document.querySelectorAll('.otp-box');
+
+    otpBoxes.forEach((box, i) => {
+      box.addEventListener('input', () => {
+        box.value = box.value.replace(/\D/g, '');
+        if (box.value) {
+          box.classList.add('filled');
+          if (i < otpBoxes.length - 1) otpBoxes[i + 1].focus();
+        } else {
+          box.classList.remove('filled');
+        }
+      });
+
+      box.addEventListener('keydown', e => {
+        if (e.key === 'Backspace' && !box.value && i > 0) {
+          otpBoxes[i - 1].value = '';
+          otpBoxes[i - 1].classList.remove('filled');
+          otpBoxes[i - 1].focus();
+        }
+        if (e.key === 'Enter') verifyOtp();
+      });
+
+      /* Coller un code copié remplit automatiquement les 6 cases */
+      box.addEventListener('paste', e => {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData)
+          .getData('text').replace(/\D/g, '').slice(0, 6);
+        otpBoxes.forEach((b, j) => {
+          b.value = text[j] || '';
+          b.classList.toggle('filled', !!b.value);
+        });
+        const nextEmpty = [...otpBoxes].findIndex(b => !b.value);
+        (nextEmpty === -1 ? otpBoxes[5] : otpBoxes[nextEmpty]).focus();
+      });
+    });
+
+    /* ── OTP step 1 : envoyer le code ──────────────────────── */
     async function sendOtp() {
       const email = document.getElementById('otp-email').value.trim();
       if (!email) return showError('otp-error', 'Saisis ton email.');
@@ -125,12 +194,14 @@
       document.getElementById('otp-email-display').textContent = email;
       document.getElementById('otp-step1').classList.add('hidden');
       document.getElementById('otp-step2').classList.add('visible');
+      setTimeout(() => otpBoxes[0].focus(), 100);
     }
 
+    /* ── OTP step 2 : vérifier le code ─────────────────────── */
     async function verifyOtp() {
       const email = document.getElementById('otp-email').value.trim();
-      const token = document.getElementById('otp-code').value.trim();
-      if (!token) return showError('otp-error', 'Saisis le code reçu.');
+      const token = [...otpBoxes].map(b => b.value).join('');
+      if (token.length < 6) return showError('otp-error', 'Saisis les 6 chiffres.');
       hideError('otp-error');
 
       const btn = document.getElementById('btn-verify-otp');
@@ -153,17 +224,16 @@
 
     document.getElementById('btn-send-otp').addEventListener('click', sendOtp);
     document.getElementById('btn-verify-otp').addEventListener('click', verifyOtp);
+
     document.getElementById('btn-resend').addEventListener('click', () => {
       document.getElementById('otp-step1').classList.remove('hidden');
       document.getElementById('otp-step2').classList.remove('visible');
+      otpBoxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
       hideError('otp-error');
     });
 
-    document.getElementById('otp-code').addEventListener('keydown', e => {
-      if (e.key === 'Enter') verifyOtp();
-    });
-
-    document.getElementById('btn-login').addEventListener('click', async function() {
+    /* ── Connexion mot de passe ─────────────────────────────── */
+    document.getElementById('btn-login').addEventListener('click', async function () {
       const email    = document.getElementById('pw-email').value.trim();
       const password = document.getElementById('pw-password').value;
       if (!email || !password) return showError('pw-error', 'Remplis tous les champs.');

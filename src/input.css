@@ -674,7 +674,7 @@
 
   .login-subtitle { font-size: 0.78rem; color: var(--gris-texte); margin-bottom: 32px; }
 
-  .tabs { display: flex; border-bottom: 1px solid var(--gris-bord); margin-bottom: 28px; }
+  .tabs { position: relative; display: flex; border-bottom: 1px solid var(--gris-bord); margin-bottom: 28px; }
 
   .tab {
     flex: 1;
@@ -693,7 +693,7 @@
   }
 
   .tab:hover { color: var(--rouge); }
-  .tab.active { color: var(--rouge); border-bottom-color: var(--rouge); }
+  .tab.active { color: var(--rouge); border-bottom-color: transparent; }
 
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
@@ -737,8 +737,21 @@
     text-transform: uppercase;
     cursor: pointer;
     margin-top: 8px;
+    position: relative;
+    overflow: hidden;
     transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   }
+
+  /* Shimmer au hover — cohérence avec btn-submit du formulaire */
+  .btn:not(.btn-secondary)::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.14);
+    transform: translateX(-100%);
+    transition: transform 0.35s ease;
+  }
+  .btn:not(.btn-secondary):hover::before { transform: translateX(0); }
 
   .btn:hover {
     background: var(--rouge-dark);
@@ -778,11 +791,104 @@
   .otp-step2.visible { display: block; }
   .otp-step1.hidden { display: none; }
 
-  .code-input {
-    letter-spacing: 0.4em;
-    font-size: 1.4rem;
-    text-align: center;
+  /* ── BLOBS DÉCORATIFS EN FOND ────────────────────────────── */
+  .login-blobs {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
   }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.07;
+    background: var(--rouge);
+  }
+  .blob-1 {
+    width: 380px;
+    height: 380px;
+    top: -120px;
+    right: -80px;
+    animation: float-blob 14s ease-in-out infinite alternate;
+  }
+  .blob-2 {
+    width: 260px;
+    height: 260px;
+    bottom: -80px;
+    left: -60px;
+    animation: float-blob 18s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes float-blob {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(24px, 18px) scale(1.06); }
+  }
+
+  /* ── ENTRÉE DE LA CARTE AU CHARGEMENT ───────────────────── */
+  @keyframes login-in {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .login-logo-enter {
+    animation: login-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .login-card-enter {
+    animation: login-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  }
+
+  /* ── TAB INDICATOR GLISSANT ─────────────────────────────── */
+  .tab-ink {
+    position: absolute;
+    bottom: -1px;
+    height: 2px;
+    background: var(--rouge);
+    border-radius: 1px;
+    transition: left  0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ── OTP — 6 cases individuelles ───────────────────────── */
+  .otp-boxes {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 4px 0 4px;
+  }
+  .otp-box {
+    width: 44px;
+    height: 52px;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: var(--font-titre);
+    border: 1.5px solid var(--gris-bord);
+    border-radius: var(--radius);
+    outline: none;
+    caret-color: var(--rouge);
+    color: var(--noir);
+    background: var(--blanc);
+    padding: 0;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+  }
+  .otp-box:focus {
+    border-color: var(--rouge);
+    box-shadow: 0 0 0 3px var(--rouge-light);
+  }
+  .otp-box.filled {
+    border-color: var(--rouge);
+    color: var(--rouge);
+  }
+
+  /* ── SHAKE SUR ERREUR ───────────────────────────────────── */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-5px); }
+    40%       { transform: translateX(5px); }
+    60%       { transform: translateX(-3px); }
+    80%       { transform: translateX(3px); }
+  }
+  .msg-error.shake { animation: shake 0.38s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
 }
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
@@ -809,6 +915,13 @@
     animation: none !important;
     background: #f0f0f0;
   }
+  .login-logo-enter,
+  .login-card-enter {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .blob-1, .blob-2 { animation: none !important; }
   *,
   *::before,
   *::after {
