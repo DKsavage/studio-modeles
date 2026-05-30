@@ -66,7 +66,7 @@ async function sendConfirmationEmails(data) {
       },
       body: JSON.stringify({
         from:     'Lumina Photography <casting@luminamodels.ca>',
-        reply_to: 'bitoungui32@gmail.com',
+        reply_to: 'luminaphotography.mtl@gmail.com',
         to:       [data.email],
         subject:  'Inscription reçue — Lumina Photography',
         html: `
@@ -90,7 +90,7 @@ async function sendConfirmationEmails(data) {
       },
       body: JSON.stringify({
         from:    'Lumina Photography <casting@luminamodels.ca>',
-        to:      ['bitoungui32@gmail.com'],
+        to:      ['luminaphotography.mtl@gmail.com'],
         subject: `Nouveau modèle inscrit — ${data.prenom} ${data.nom}`,
         html: `
           <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #0a0a0a;">

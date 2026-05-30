@@ -32,7 +32,7 @@ module.exports = async function handler(req, res) {
     },
     body: JSON.stringify({
       from:     'Lumina Photography <casting@luminamodels.ca>',
-      reply_to: 'bitoungui32@gmail.com',
+      reply_to: 'luminaphotography.mtl@gmail.com',
       to:       [email],
       subject:  'Félicitations — Tu as été sélectionné(e) par Lumina Photography',
       html: `
