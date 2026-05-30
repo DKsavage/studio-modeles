@@ -11,15 +11,20 @@
 
   <header>
     <div class="logo">Lumina<span>Photography</span></div>
-    <div style="display:flex;align-items:center;gap:12px;">
+    <div class="flex items-center gap-3">
       <div class="header-badge">Dashboard Admin</div>
-      <button onclick="sessionStorage.removeItem('admin_token');window.location.href='/login.html'" style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;background:none;border:1px solid var(--gris-bord);padding:6px 14px;border-radius:20px;cursor:pointer;color:var(--gris-texte);font-family:var(--font-corps);">Déconnexion</button>
+      <button
+        onclick="sessionStorage.removeItem('admin_token');window.location.href='/login.html'"
+        class="font-corps text-xs tracking-widest uppercase bg-transparent border border-gray-200 px-4 py-1.5 rounded-full cursor-pointer text-gray-400 hover:border-gray-900 hover:text-gray-900 transition-all duration-200"
+      >Déconnexion</button>
     </div>
   </header>
 
   <div class="dashboard">
-    <h2>Candidatures</h2>
-    <p class="count" id="count">Chargement…</p>
+    <div class="flex items-baseline justify-between mb-2">
+      <h2>Candidatures</h2>
+      <p class="count" id="count">Chargement…</p>
+    </div>
 
     <input type="search" id="search" class="search-input" placeholder="Rechercher par nom, email…" />
 
@@ -107,21 +112,27 @@
       }
 
       grid.innerHTML = data.map(c => `
-        <div class="card">
-          <div class="card-photos">
-            <img src="${c.photo_profil_signed || ''}" alt="Profil ${c.prenom}" onclick="window.open(this.src)" />
-            <img src="${c.photo_body_signed   || ''}" alt="Body ${c.prenom}"   onclick="window.open(this.src)" />
+        <div class="card group">
+          <div class="card-photos overflow-hidden">
+            <img src="${c.photo_profil_signed || ''}" alt="Profil ${c.prenom}"
+                 onclick="window.open(this.src)"
+                 class="transition-transform duration-500 ease-out group-hover:scale-105 cursor-zoom-in" />
+            <img src="${c.photo_body_signed   || ''}" alt="Body ${c.prenom}"
+                 onclick="window.open(this.src)"
+                 class="transition-transform duration-500 ease-out group-hover:scale-105 cursor-zoom-in" />
           </div>
           <div class="card-body">
             <div class="card-name">${c.prenom} ${c.nom}</div>
             <div class="card-meta">${c.email} · ${c.telephone}</div>
             <div class="card-info">
-              <span class="badge">${c.genre || '—'}</span>
-              <span class="badge">${c.taille ? c.taille + ' cm' : '—'}</span>
-              <span class="badge">${c.experience || '—'}</span>
-              <span class="badge">Haut ${c.taille_haut || '—'}</span>
-              <span class="badge">Bas ${c.taille_bas || '—'}</span>
-              ${c.instagram ? `<br/><a href="${c.instagram}" target="_blank" style="font-size:0.78rem;color:var(--gris-texte)">${c.instagram}</a>` : ''}
+              <div class="flex flex-wrap gap-1 mb-2">
+                <span class="badge">${c.genre || '—'}</span>
+                <span class="badge">${c.taille ? c.taille + ' cm' : '—'}</span>
+                <span class="badge">${c.experience || '—'}</span>
+                <span class="badge">Haut ${c.taille_haut || '—'}</span>
+                <span class="badge">Bas ${c.taille_bas || '—'}</span>
+              </div>
+              ${c.instagram ? `<a href="${c.instagram}" target="_blank" class="text-xs text-gray-400 hover:text-rouge transition-colors duration-200 break-all">${c.instagram}</a>` : ''}
             </div>
             <button
               class="btn-select"
