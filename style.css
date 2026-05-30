@@ -1,186 +1,227 @@
 /* ═══════════════════════════════════════════════════════════════
-   STYLE.CSS — Feuille de styles
-   ═══════════════════════════════════════════════════════════════
-   Ce fichier contient TOUTE l'apparence de la page :
-   couleurs, tailles, polices, animations, mise en page.
-
-   Les commentaires CSS s'écrivent : (slash-étoile ... étoile-slash)
-   Pas de // comme en JavaScript.
+   STYLE.CSS — Lumina Photography
+   Phase 6 — Design moderne / luxe
 ═══════════════════════════════════════════════════════════════ */
 
 
 /* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #1 — VARIABLES (custom properties)
-   :root cible la racine du document (toute la page).
-   On déclare des variables avec --nom: valeur;
-   On les réutilise partout avec var(--nom)
-
-   Avantage : changer une couleur ici = répercuté partout.
+   VARIABLES
+   :root = la racine du document (toute la page).
+   Changer une valeur ici = répercuté partout automatiquement.
 ───────────────────────────────────────────────────────────── */
 :root {
-  /* Palette de couleurs */
-  --noir:       #0a0a0a;
-  --blanc:      #fafafa;
-  --gris-clair: #f2f2f2;
-  --gris-bord:  #d0d0d0;
-  --gris-texte: #6b6b6b;
-  --erreur:     #c0392b;
+  /* Palette Lumina */
+  --noir:        #0a0a0a;
+  --blanc:       #ffffff;
+  --rouge:       #d4293a;   /* rouge signature Lumina */
+  --rouge-dark:  #a81f2d;   /* hover / état enfoncé */
+  --rouge-light: rgba(212, 41, 58, 0.08);
 
-  /* Typographie */
+  /* Neutres */
+  --gris-clair:  #f5f5f5;
+  --gris-bord:   #e2e2e2;
+  --gris-texte:  #6b6b6b;
+  --erreur:      #c0392b;
+
+  /* Typo */
   --font-titre: 'Cormorant Garamond', serif;
   --font-corps: 'DM Sans', sans-serif;
 
-  /* Espacements / effets */
-  --radius:     4px;
+  /* Effets */
+  --radius:     6px;
   --transition: 0.25s ease;
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.07);
+  --shadow-md:  0 12px 40px rgba(0,0,0,0.12);
 }
 
 
+/* ── RESET ─────────────────────────────────────────────────── */
 *, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-
 body {
   font-family: var(--font-corps);
-  background-color: var(--blanc);
+  background: var(--blanc);
   color: var(--noir);
-  min-height: 100vh; /* vh = viewport height. 100vh = écran entier */
-  line-height: 1.6;  /* interligne = 1.6× la taille de la police */
+  min-height: 100vh;
+  line-height: 1.6;
 }
 
+
+/* ── HEADER ─────────────────────────────────────────────────
+   position: sticky = reste en haut même en scrollant.
+   backdrop-filter = effet "verre dépoli" (flou derrière).
+───────────────────────────────────────────────────────────── */
 header {
-  padding: 24px 40px;
-  border-bottom: 1px solid var(--gris-clair);
+  padding: 18px 40px;
   display: flex;
-  align-items: center;            /* centre verticalement */
-  justify-content: space-between; /* logo à gauche, badge à droite */
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--gris-bord);
+  z-index: 100;
 }
 
 .logo {
   font-family: var(--font-titre);
-  font-size: 1.6rem;
-  font-weight: 600;
-  letter-spacing: 0.08em; /* espace entre les lettres */
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  color: var(--rouge);
 }
 
-/* .logo span = cible les <span> à l'intérieur de .logo */
+/* Le mot "Photography" — plus fin, couleur neutre */
 .logo span {
   font-weight: 300;
-  color: var(--gris-texte);
+  color: var(--noir);
+  font-size: 1.1rem;
+  margin-left: 8px;
+  letter-spacing: 0.2em;
 }
 
 .header-badge {
-  font-size: 0.72rem;
-  letter-spacing: 0.15em;
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--gris-texte);
   border: 1px solid var(--gris-bord);
   padding: 6px 14px;
-  border-radius: 20px; /* très arrondi = pilule */
+  border-radius: 20px;
 }
 
+
+/* ── HERO ───────────────────────────────────────────────────
+   Section d'en-tête sombre, dramatique.
+   ::before = ligne rouge décorative en haut (pseudo-élément).
+───────────────────────────────────────────────────────────── */
 .hero {
+  background: var(--noir);
+  color: var(--blanc);
   text-align: center;
-  padding: 64px 24px 52px;
-  border-bottom: 1px solid var(--gris-clair);
+  padding: 80px 24px 72px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ligne rouge verticale en haut du hero */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 52px;
+  background: var(--rouge);
 }
 
 .hero-label {
-  font-size: 0.7rem;
-  letter-spacing: 0.22em;
+  font-size: 0.66rem;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--gris-texte);
-  margin-bottom: 18px;
+  color: var(--rouge);
+  margin-bottom: 24px;
+  margin-top: 20px;
 }
 
 .hero h1 {
   font-family: var(--font-titre);
-  font-size: clamp(2rem, 5vw, 3.8rem);
+  font-size: clamp(2.2rem, 6vw, 4.4rem);
   font-weight: 300;
-  line-height: 1.15;
-  margin-bottom: 18px;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  color: var(--blanc);
 }
 
 .hero h1 em {
   font-style: italic;
   font-weight: 600;
+  color: var(--rouge);
 }
 
 .hero p {
-  color: var(--gris-texte);
-  font-size: 0.92rem;
-  max-width: 460px;
-  margin: 0 auto; /* 0 haut/bas, auto gauche/droite = centré horizontalement */
+  color: rgba(255,255,255,0.55);
+  font-size: 0.88rem;
+  max-width: 440px;
+  margin: 0 auto;
+  line-height: 1.8;
 }
 
 
+/* ── FORMULAIRE — LAYOUT ────────────────────────────────── */
 main {
   max-width: 820px;
   margin: 0 auto;
-  padding: 56px 24px 100px;
+  padding: 64px 24px 100px;
 }
 
 .form-section {
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 
 .section-header {
   display: flex;
-  align-items: baseline; /* aligne sur la ligne de base du texte */
-  gap: 14px;
-  margin-bottom: 28px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--gris-clair);
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--gris-bord);
 }
 
+/* Numéro de section en rouge Lumina */
 .section-num {
   font-family: var(--font-titre);
   font-size: 2.2rem;
   font-weight: 300;
-  color: #8a8a8a; /* #d0d0d0 échouait WCAG (ratio 1.47) — 8a8a8a = 3.3:1 ✓ */
+  color: var(--rouge);
   line-height: 1;
 }
 
 .section-title {
   font-family: var(--font-titre);
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   font-weight: 600;
 }
 
+/* Grille 2 colonnes sur desktop */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 22px;
 }
-
 
 .full-width {
   grid-column: 1 / -1;
 }
 
-
 .field-group {
   display: flex;
-  flex-direction: column; /* empile label + input verticalement */
-  gap: 6px;
+  flex-direction: column;
+  gap: 7px;
 }
 
 label {
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--gris-texte);
   font-weight: 500;
 }
 
 .required {
-  color: var(--noir);
+  color: var(--rouge);
 }
 
+
+/* ── CHAMPS DE SAISIE ────────────────────────────────────── */
 input[type="text"],
 input[type="email"],
 input[type="tel"],
@@ -188,33 +229,33 @@ input[type="number"],
 select {
   width: 100%;
   padding: 13px 16px;
-  border: 1px solid var(--gris-bord);
+  border: 1.5px solid var(--gris-bord);
   border-radius: var(--radius);
   font-family: var(--font-corps);
   font-size: 0.92rem;
   color: var(--noir);
   background: var(--blanc);
-  outline: none; /* retire le contour bleu par défaut */
+  outline: none;
   appearance: none;
   -webkit-appearance: none;
-  /* transition = animation douce sur les propriétés listées */
   transition: border-color var(--transition), box-shadow var(--transition);
 }
 
+/* Focus = rouge Lumina */
 input:focus,
 select:focus {
-  border-color: var(--noir);
-  /* box-shadow: décalageX décalageY flou expansion couleur */
-  box-shadow: 0 0 0 3px rgba(10,10,10,0.07);
+  border-color: var(--rouge);
+  box-shadow: 0 0 0 3px var(--rouge-light);
 }
 
-/* Classe ajoutée par JS quand la validation échoue */
+/* Erreur de validation */
 input.error,
 select.error {
   border-color: var(--erreur);
+  box-shadow: 0 0 0 3px rgba(192,57,43,0.08);
 }
 
-
+/* Flèche personnalisée du <select> */
 select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -223,28 +264,26 @@ select {
   cursor: pointer;
 }
 
-
-/* Input avec unité (cm) */
+/* Champ avec unité (cm, EU) */
 .input-with-unit {
-  position: relative; /* requis pour positionner .unit en absolute À L'INTÉRIEUR */
+  position: relative;
 }
 
 .input-with-unit input {
-  padding-right: 48px; /* espace à droite pour l'unité */
+  padding-right: 48px;
 }
 
 .unit {
-  position: absolute; /* sort du flux normal */
+  position: absolute;
   right: 14px;
   top: 50%;
-  transform: translateY(-50%); /* centrage vertical parfait */
+  transform: translateY(-50%);
   font-size: 0.75rem;
   color: var(--gris-texte);
-  pointer-events: none; /* le clic passe à travers vers l'input */
+  pointer-events: none;
 }
 
-
-/* Message d'erreur — caché par défaut, JS le rend visible */
+/* Message d'erreur — JS ajoute .visible pour l'afficher */
 .field-error {
   font-size: 0.72rem;
   color: var(--erreur);
@@ -256,6 +295,7 @@ select {
 }
 
 
+/* ── ZONES D'UPLOAD ─────────────────────────────────────── */
 .uploads-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -265,14 +305,14 @@ select {
 .upload-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
 }
 
 .upload-zone {
-  position: relative; /* requis pour positionner l'input en absolute */
+  position: relative;
   border: 1.5px dashed var(--gris-bord);
   border-radius: var(--radius);
-  padding: 36px 16px;
+  padding: 40px 16px;
   text-align: center;
   cursor: pointer;
   background: var(--gris-clair);
@@ -285,29 +325,29 @@ select {
 }
 
 .upload-zone:hover {
-  border-color: var(--noir);
-  background: #ebebeb;
+  border-color: var(--rouge);
+  background: var(--rouge-light);
 }
 
 .upload-zone.has-photo {
   border-style: solid;
-  border-color: var(--noir);
+  border-color: var(--rouge);
   padding: 0;
 }
 
-/* L'input invisible par-dessus toute la zone */
+/* L'input file recouvre toute la zone — invisible */
 .upload-zone input[type="file"] {
   position: absolute;
-  inset: 0; /* raccourci : top:0; right:0; bottom:0; left:0; */
+  inset: 0;
   opacity: 0;
   cursor: pointer;
   width: 100%;
   height: 100%;
-  z-index: 2; /* couche d'empilement, par-dessus le placeholder */
+  z-index: 2;
 }
 
 .upload-placeholder {
-  pointer-events: none; /* clics passent à travers vers l'input */
+  pointer-events: none;
 }
 
 .upload-icon {
@@ -323,32 +363,28 @@ select {
 }
 
 .upload-label-sub {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--gris-texte);
 }
 
 .upload-preview {
-  display: none; /* caché par défaut, JS l'affiche */
+  display: none;
   width: 100%;
   height: 180px;
-  object-fit: cover;     /* remplit le cadre sans déformer */
-  object-position: top;  /* cadre sur le haut (visage) */
+  object-fit: cover;
+  object-position: top;
   border-radius: var(--radius);
 }
 
 
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #11 — RADIOS STYLISÉS
+/* ── BOUTONS RADIO / TAILLES ────────────────────────────────
    On cache le vrai radio et on stylise un <span> à la place.
-   Quand le radio est :checked, on cible le span voisin avec ~
-
-   ~ = sélecteur "frère général" → un élément qui suit dans le HTML.
-   input:checked ~ span → le span qui suit un input coché.
+   input:checked ~ span cible le span qui suit un radio coché.
 ───────────────────────────────────────────────────────────── */
 .size-selector {
   display: flex;
-  flex-wrap: wrap; /* passe à la ligne si pas assez de place */
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 4px;
 }
 
@@ -357,7 +393,6 @@ select {
   cursor: pointer;
 }
 
-/* On cache le vrai bouton radio */
 .size-btn input[type="radio"] {
   position: absolute;
   opacity: 0;
@@ -365,7 +400,6 @@ select {
   height: 0;
 }
 
-/* Le "faux" bouton visible */
 .size-btn span {
   display: flex;
   align-items: center;
@@ -378,71 +412,66 @@ select {
   font-weight: 500;
   color: var(--gris-texte);
   transition: all var(--transition);
-  user-select: none; /* empêche la sélection de texte au clic */
+  user-select: none;
 }
 
 .size-btn:hover span {
-  border-color: var(--noir);
-  color: var(--noir);
+  border-color: var(--rouge);
+  color: var(--rouge);
 }
 
-/* Quand le radio est coché → on stylise le span voisin */
 .size-btn input[type="radio"]:checked ~ span {
-  background: var(--noir);
-  border-color: var(--noir);
+  background: var(--rouge);
+  border-color: var(--rouge);
   color: var(--blanc);
   font-weight: 600;
 }
 
 
-/* ─────────────────────────────────────────────────────────────
-   📘 COURS CSS #12 — PSEUDO-ÉLÉMENTS ::before / ::after
-   Permettent d'ajouter un élément visuel SANS HTML.
-   content: '' est OBLIGATOIRE pour qu'ils s'affichent.
-   Ici : effet de brillance qui glisse au survol du bouton.
+/* ── BOUTON DE SOUMISSION ───────────────────────────────────
+   ::before = effet de brillance qui glisse au survol.
 ───────────────────────────────────────────────────────────── */
 .form-footer {
-  margin-top: 48px;
+  margin-top: 56px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .btn-submit {
-  background: var(--noir);
+  background: var(--rouge);
   color: var(--blanc);
   border: none;
-  padding: 18px 64px;
+  padding: 18px 72px;
   font-family: var(--font-corps);
   font-size: 0.78rem;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   border-radius: var(--radius);
   cursor: pointer;
   position: relative;
-  overflow: hidden; /* cache le ::before quand il dépasse */
-  transition: box-shadow var(--transition), transform var(--transition);
+  overflow: hidden;
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
 }
 
-/* Le pseudo-élément ::before = effet de brillance */
 .btn-submit::before {
-  content: ''; /* obligatoire */
+  content: '';
   position: absolute;
   inset: 0;
-  background: rgba(255,255,255,0.1);
-  transform: translateX(-100%); /* caché à gauche par défaut */
+  background: rgba(255,255,255,0.12);
+  transform: translateX(-100%);
   transition: transform 0.35s ease;
 }
 
-/* Au survol, on fait glisser ::before de gauche à droite */
 .btn-submit:hover::before {
   transform: translateX(0);
 }
 
 .btn-submit:hover {
-  box-shadow: 0 8px 28px rgba(0,0,0,0.22);
-  transform: translateY(-1px); /* légère élévation */
+  background: var(--rouge-dark);
+  box-shadow: 0 10px 36px rgba(212,41,58,0.32);
+  transform: translateY(-2px);
 }
 
 .btn-submit:active {
@@ -456,16 +485,17 @@ select {
 }
 
 .form-note {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--gris-texte);
+  letter-spacing: 0.02em;
 }
 
 
-/* Message de succès */
+/* ── MESSAGE DE SUCCÈS ─────────────────────────────────────── */
 .success-message {
   display: none;
   text-align: center;
-  padding: 80px 24px;
+  padding: 100px 24px;
 }
 
 .success-message.visible {
@@ -473,22 +503,28 @@ select {
 }
 
 .success-icon {
-  font-size: 2.8rem;
-  margin-bottom: 20px;
+  font-size: 2.2rem;
+  margin-bottom: 24px;
+  color: var(--rouge);
 }
 
 .success-message h2 {
   font-family: var(--font-titre);
-  font-size: 2rem;
+  font-size: 2.4rem;
   font-weight: 300;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 .success-message p {
   color: var(--gris-texte);
   font-size: 0.9rem;
+  line-height: 1.8;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
+
+/* ── HONEYPOT — caché pour les humains ─────────────────────── */
 .honeypot {
   position: absolute;
   left: -9999px;
@@ -500,26 +536,45 @@ select {
   pointer-events: none;
 }
 
+
+/* ── RESPONSIVE — MOBILE ─────────────────────────────────────
+   max-width: 640px = s'applique sur les petits écrans.
+   Mobile-first : on simplifie la grille, on ajuste les espaces.
+───────────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
   header {
-    padding: 16px 20px;
+    padding: 14px 20px;
   }
 
   .logo {
     font-size: 1.2rem;
   }
 
-  main {
-    padding: 36px 16px 80px;
+  .logo span {
+    font-size: 0.9rem;
+    margin-left: 5px;
   }
 
-  /* Sur mobile : tout passe à 1 colonne */
+  .hero {
+    padding: 60px 20px 52px;
+  }
+
+  main {
+    padding: 40px 16px 80px;
+  }
+
   .form-grid,
   .uploads-grid {
     grid-template-columns: 1fr;
   }
 
   .full-width {
-    grid-column: 1; /* plus besoin de s'étendre, il n'y a qu'une colonne */
+    grid-column: 1;
+  }
+
+  .btn-submit {
+    padding: 16px 40px;
+    width: 100%;
+    max-width: 360px;
   }
 }
