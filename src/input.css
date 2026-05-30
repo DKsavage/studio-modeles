@@ -27,6 +27,20 @@
     min-height: 100vh;
     line-height: 1.6;
   }
+
+  /* Titres équilibrés — évite les veuves en fin de ligne */
+  h1, h2, h3 { text-wrap: balance; }
+
+  /* Focus keyboard — ring rouge Lumina, pas le contour navigateur */
+  *:focus { outline: none; }
+  *:focus-visible {
+    outline: 2px solid var(--rouge);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Admin — fond légèrement warm pour faire ressortir les cartes blanches */
+  body:has(.dashboard) { background: #f3f2f0; }
 }
 
 /* ── SELECTION & SCROLLBAR ──────────────────────────────── */
@@ -190,12 +204,24 @@
     font-weight: 300;
     color: var(--rouge);
     line-height: 1;
+    opacity: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.45s ease 0.15s, transform 0.45s ease 0.15s;
   }
 
   .section-title {
     font-family: var(--font-titre);
     font-size: 1.4rem;
     font-weight: 600;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.45s ease 0.28s, transform 0.45s ease 0.28s;
+  }
+
+  .form-section.revealed .section-num,
+  .form-section.revealed .section-title {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .form-grid {
@@ -456,6 +482,19 @@
     font-size: 2rem;
     font-weight: 300;
     margin-bottom: 32px;
+    position: relative;
+    padding-bottom: 14px;
+  }
+
+  .dashboard h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 36px;
+    height: 2px;
+    background: var(--rouge);
+    border-radius: 1px;
   }
 
   .candidatures-grid {
@@ -480,7 +519,7 @@
   }
 
   .card:hover {
-    box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.12), 0 0 0 1px rgba(212,41,58,0.15);
     transform: translateY(-3px);
     border-color: transparent;
   }
@@ -544,6 +583,11 @@
     gap: 0;
   }
 
+  @keyframes stat-fade {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
   .stat-block {
     flex: 1;
     display: flex;
@@ -551,7 +595,13 @@
     align-items: center;
     gap: 4px;
     min-width: 60px;
+    animation: stat-fade 0.4s ease both;
   }
+
+  .stat-block:nth-child(1) { animation-delay: 0.05s; }
+  .stat-block:nth-child(3) { animation-delay: 0.15s; }
+  .stat-block:nth-child(5) { animation-delay: 0.25s; }
+  .stat-block:nth-child(7) { animation-delay: 0.35s; }
 
   .stat-num {
     font-family: var(--font-titre);
@@ -660,6 +710,11 @@
     overflow: hidden;
   }
 
+  @keyframes img-fade {
+    from { opacity: 0; transform: scale(1.04); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
   .card-photo-main,
   .card-photo-hover {
     position: absolute;
@@ -670,6 +725,8 @@
     object-position: top;
     cursor: zoom-in;
   }
+
+  .card-photo-main { animation: img-fade 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
   /* Crossfade vers la 2ème photo au hover */
   .card-photo-hover {
@@ -1084,8 +1141,8 @@
     transition: all 0.2s ease;
   }
 
-  .chip:hover { border-color: var(--rouge); color: var(--rouge); }
-  .chip.active { background: var(--rouge); border-color: var(--rouge); color: var(--blanc); }
+  .chip:hover  { border-color: var(--rouge); color: var(--rouge); transform: translateY(-1px); }
+  .chip.active { background: var(--rouge); border-color: var(--rouge); color: var(--blanc); transform: translateY(-1px); }
 
   .reset-btn {
     align-self: flex-end;
@@ -1391,6 +1448,9 @@
   }
   .blob-1, .blob-2 { animation: none !important; }
   .card { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .card-photo-main { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .stat-block { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .section-num, .section-title { transition: none !important; }
   *,
   *::before,
   *::after {
