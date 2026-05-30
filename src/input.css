@@ -758,6 +758,196 @@
   /* Nom caché en grille (il est dans l'overlay) — visible en liste */
   .card-name-list { display: none; }
 
+  /* ── BOUTON DE SÉLECTION (cercle en coin photo) ─────────── */
+  .btn-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.55);
+    background: rgba(10, 10, 10, 0.3);
+    backdrop-filter: blur(6px);
+    cursor: pointer;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    padding: 0;
+  }
+
+  /* Coche SVG en CSS */
+  .btn-check::after {
+    content: '';
+    width: 9px;
+    height: 5px;
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) translateY(-1px);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-check:hover {
+    border-color: rgba(255, 255, 255, 0.9);
+    background: rgba(10, 10, 10, 0.5);
+    transform: scale(1.08);
+  }
+
+  .btn-check.checked {
+    background: var(--rouge);
+    border-color: var(--rouge);
+    transform: scale(1.05);
+  }
+
+  .btn-check.checked::after { opacity: 1; }
+
+  .btn-check:disabled {
+    cursor: default;
+    opacity: 0.5;
+    transform: none;
+  }
+
+  /* Carte sélectionnée (en attente d'envoi) */
+  .card.card-checked {
+    border-color: var(--rouge);
+    box-shadow: 0 0 0 2px var(--rouge), 0 16px 48px rgba(212, 41, 58, 0.18);
+  }
+
+  /* ── BARRE D'ACTION FLOTTANTE ───────────────────────────── */
+  .action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    padding: 0 24px 20px;
+    transform: translateY(120%);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+
+  .action-bar.visible {
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .action-bar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: var(--noir);
+    border-radius: 16px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: 0 8px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255,255,255,0.06);
+  }
+
+  .action-bar-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+
+  .action-bar-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--rouge);
+    animation: pulse 1.8s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  #selection-count {
+    color: #fff;
+    font-size: 0.85rem;
+    font-family: var(--font-corps);
+    white-space: nowrap;
+  }
+
+  .action-bar-clear {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-family: var(--font-corps);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    padding: 0;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .action-bar-clear:hover { color: rgba(255, 255, 255, 0.85); }
+
+  .action-bar-btn {
+    background: var(--rouge);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 24px;
+    font-family: var(--font-corps);
+    font-size: 0.76rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s ease, transform 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .action-bar-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.14);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .action-bar-btn:hover { background: var(--rouge-dark); transform: translateY(-1px); }
+  .action-bar-btn:hover::before { transform: translateX(0); }
+  .action-bar-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+  /* ── TOAST DE NOTIFICATION ──────────────────────────────── */
+  .toast {
+    position: fixed;
+    top: 76px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background: var(--noir);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 40px;
+    font-family: var(--font-corps);
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    z-index: 300;
+    white-space: nowrap;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  }
+
+  .toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .toast.success { background: #2d6a4f; }
+  .toast.error   { background: var(--erreur); }
+
   /* ── ⑥ VUE LISTE ────────────────────────────────────────── */
   .candidatures-grid.list-view {
     grid-template-columns: 1fr;

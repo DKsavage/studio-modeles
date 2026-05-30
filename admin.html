@@ -27,7 +27,7 @@
       <p class="count" id="count">Chargement…</p>
     </div>
 
-    <!-- ① Stats animées -->
+    <!-- Stats animées -->
     <div class="stats-bar">
       <div class="stat-block">
         <span class="stat-num" id="stat-total">—</span>
@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <!-- ⑤ Recherche avec icône loupe → X -->
+    <!-- Recherche avec icône -->
     <div class="search-wrapper" id="search-wrapper">
       <span class="search-icon" aria-hidden="true">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -106,8 +106,6 @@
         </div>
       </div>
       <button class="reset-btn" id="reset">Réinitialiser</button>
-
-      <!-- ⑥ Toggle grille / liste -->
       <div class="view-toggle">
         <button class="view-btn active" id="btn-grid" title="Vue grille">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -128,6 +126,26 @@
     <div class="candidatures-grid" id="grid"></div>
   </div>
 
+  <!-- Barre d'action flottante (sélection multiple) -->
+  <div class="action-bar" id="action-bar" aria-live="polite">
+    <div class="action-bar-inner">
+      <div class="action-bar-info">
+        <span class="action-bar-dot"></span>
+        <span id="selection-count">0 sélectionné</span>
+        <button class="action-bar-clear" id="btn-clear-selection">Tout désélectionner</button>
+      </div>
+      <button class="action-bar-btn" id="btn-send-selection">
+        Envoyer la sélection
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="margin-left:8px;vertical-align:-2px">
+          <path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast de notification -->
+  <div class="toast" id="toast"></div>
+
   <script>
     const adminToken = sessionStorage.getItem('admin_token');
     if (!adminToken) window.location.href = '/login.html';
@@ -135,7 +153,11 @@
     let allCandidatures = [];
     let activeFilters = { genre: null, experience: null, taille_haut: null, taille_bas: null };
 
-    /* ── ③ Skeleton ───────────────────────────────────────── */
+    /* ── État de sélection ──────────────────────────────────── */
+    const selectedModels = new Map(); /* email → { prenom, nom } */
+    const sentEmails     = new Set(); /* emails déjà envoyés (persisté par session) */
+
+    /* ── Skeleton ───────────────────────────────────────────── */
     function renderSkeleton() {
       document.getElementById('grid').innerHTML = Array(6).fill('').map(() => `
         <div class="skeleton-card">
@@ -164,7 +186,7 @@
       renderCards(filtered);
     }
 
-    /* ── ① Cards portrait + ② stagger ──────────────────────── */
+    /* ── Rendu des cartes ───────────────────────────────────── */
     function renderCards(data) {
       const grid = document.getElementById('grid');
       document.getElementById('count').textContent =
@@ -175,17 +197,19 @@
         return;
       }
 
-      grid.innerHTML = data.map((c, i) => `
-        <div class="card" style="animation-delay:${i * 50}ms">
+      grid.innerHTML = data.map((c, i) => {
+        const checked = selectedModels.has(c.email);
+        const sent    = sentEmails.has(c.email);
+        return `
+        <div class="card${checked ? ' card-checked' : ''}${sent ? ' is-selected' : ''}"
+             style="animation-delay:${i * 50}ms">
 
-          <!-- Photo portrait plein-cadre + overlay + crossfade -->
           <div class="card-photos-portrait">
             <img src="${c.photo_profil_signed || ''}" alt="Profil ${c.prenom}"
                  class="card-photo-main" onclick="window.open(this.src)" />
             <img src="${c.photo_body_signed   || ''}" alt="Corps ${c.prenom}"
                  class="card-photo-hover" onclick="window.open(this.src)" />
 
-            <!-- Gradient overlay avec nom + badges -->
             <div class="card-glass-overlay">
               <div class="card-name-overlay">${c.prenom} ${c.nom}</div>
               <div class="flex flex-wrap gap-1 mt-1">
@@ -195,37 +219,143 @@
               </div>
             </div>
 
-            <!-- ③ Overlay sélection -->
-            <div class="selected-overlay"></div>
-            <div class="selected-badge">✓ Sélectionné</div>
-          </div>
-
-          <!-- Infos sous la photo -->
-          <div class="card-body-minimal">
-            <div class="card-name card-name-list">${c.prenom} ${c.nom}</div>
-            <div class="card-meta">${c.email} · ${c.telephone}</div>
-            <div class="flex flex-wrap gap-1 mt-2 mb-3">
-              <span class="badge">Haut ${c.taille_haut || '—'}</span>
-              <span class="badge">Bas ${c.taille_bas   || '—'}</span>
-            </div>
-            ${c.instagram
-              ? `<a href="${c.instagram}" target="_blank"
-                   class="text-xs text-gray-400 hover:text-rouge transition-colors duration-200 break-all block mb-3">${c.instagram}</a>`
-              : ''}
+            <!-- Bouton de sélection (cercle) -->
             <button
-              class="btn-select"
+              class="btn-check${checked ? ' checked' : ''}"
               data-email="${c.email}"
               data-prenom="${c.prenom}"
               data-nom="${c.nom || ''}"
-              onclick="selectModel(this)"
-            >Sélectionner ce modèle</button>
+              onclick="toggleSelect(this)"
+              aria-label="Sélectionner ${c.prenom} ${c.nom}"
+              ${sent ? 'disabled' : ''}
+            ></button>
+
+            <div class="selected-overlay"></div>
+            <div class="selected-badge">✓ Envoyé</div>
           </div>
 
-        </div>
-      `).join('');
+          <div class="card-body-minimal">
+            <div class="card-name card-name-list">${c.prenom} ${c.nom}</div>
+            <div class="card-meta">${c.email} · ${c.telephone}</div>
+            <div class="flex flex-wrap gap-1 mt-2 mb-2">
+              <span class="badge">Haut ${c.taille_haut || '—'}</span>
+              <span class="badge">Bas  ${c.taille_bas   || '—'}</span>
+            </div>
+            ${c.instagram
+              ? `<a href="${c.instagram}" target="_blank"
+                   class="text-xs text-gray-400 hover:text-rouge transition-colors duration-200 break-all block">${c.instagram}</a>`
+              : ''}
+          </div>
+
+        </div>`;
+      }).join('');
     }
 
-    /* ── ④ Stats count-up ───────────────────────────────────── */
+    /* ── Sélection multiple ─────────────────────────────────── */
+    function toggleSelect(btn) {
+      const email  = btn.dataset.email;
+      const prenom = btn.dataset.prenom;
+      const nom    = btn.dataset.nom;
+      const card   = btn.closest('.card');
+
+      if (selectedModels.has(email)) {
+        selectedModels.delete(email);
+        card.classList.remove('card-checked');
+        btn.classList.remove('checked');
+      } else {
+        selectedModels.set(email, { prenom, nom });
+        card.classList.add('card-checked');
+        btn.classList.add('checked');
+      }
+      updateActionBar();
+    }
+
+    function updateActionBar() {
+      const count = selectedModels.size;
+      const bar   = document.getElementById('action-bar');
+      const label = count === 1
+        ? '1 modèle sélectionné'
+        : `${count} modèles sélectionnés`;
+      document.getElementById('selection-count').textContent = label;
+      bar.classList.toggle('visible', count > 0);
+    }
+
+    function clearSelection() {
+      selectedModels.clear();
+      document.querySelectorAll('.card-checked').forEach(c => c.classList.remove('card-checked'));
+      document.querySelectorAll('.btn-check.checked').forEach(b => b.classList.remove('checked'));
+      updateActionBar();
+    }
+
+    /* ── Envoi groupé ───────────────────────────────────────── */
+    async function sendToSelected() {
+      const btn    = document.getElementById('btn-send-selection');
+      const models = [...selectedModels.entries()];
+      if (models.length === 0) return;
+
+      btn.disabled    = true;
+      btn.textContent = `Envoi en cours…`;
+
+      const results = await Promise.allSettled(
+        models.map(([email, { prenom, nom }]) =>
+          fetch('/api/select', {
+            method: 'POST',
+            headers: {
+              'Content-Type':  'application/json',
+              'Authorization': `Bearer ${adminToken}`,
+            },
+            body: JSON.stringify({ email, prenom, nom }),
+          }).then(r => ({ ok: r.ok, email }))
+        )
+      );
+
+      let success = 0;
+      let fail    = 0;
+
+      results.forEach(result => {
+        if (result.status === 'fulfilled' && result.value.ok) {
+          const email = result.value.email;
+          sentEmails.add(email);
+          success++;
+          /* Marquer la carte comme envoyée */
+          document.querySelectorAll('.btn-check').forEach(b => {
+            if (b.dataset.email === email) {
+              const card = b.closest('.card');
+              card.classList.add('is-selected');
+              card.classList.remove('card-checked');
+              b.classList.remove('checked');
+              b.disabled = true;
+            }
+          });
+        } else {
+          fail++;
+        }
+      });
+
+      selectedModels.clear();
+      updateActionBar();
+
+      btn.disabled    = false;
+      btn.innerHTML   = 'Envoyer la sélection <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="margin-left:8px;vertical-align:-2px"><path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+      if (fail === 0) {
+        showToast(`${success} email${success > 1 ? 's' : ''} envoyé${success > 1 ? 's' : ''} ✓`, 'success');
+      } else {
+        showToast(`${success} envoyé${success > 1 ? 's' : ''} · ${fail} échec${fail > 1 ? 's' : ''}`, 'error');
+      }
+    }
+
+    /* ── Toast de notification ──────────────────────────────── */
+    let toastTimer;
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      clearTimeout(toastTimer);
+      toast.textContent = msg;
+      toast.className   = `toast ${type} visible`;
+      toastTimer = setTimeout(() => toast.classList.remove('visible'), 3500);
+    }
+
+    /* ── Stats count-up ─────────────────────────────────────── */
     function countUp(el, target, duration = 900) {
       const start = performance.now();
       function step(now) {
@@ -240,7 +370,6 @@
     function updateStats(data) {
       const femmes = data.filter(c => c.genre === 'Femme').length;
       const hommes = data.filter(c => c.genre === 'Homme').length;
-
       const expCount = {};
       data.forEach(c => {
         if (c.experience) expCount[c.experience] = (expCount[c.experience] || 0) + 1;
@@ -278,7 +407,7 @@
       renderCards(allCandidatures);
     });
 
-    /* ── ⑤ Recherche — loupe → X ────────────────────────────── */
+    /* ── Recherche ──────────────────────────────────────────── */
     const searchInput   = document.getElementById('search');
     const searchWrapper = document.getElementById('search-wrapper');
 
@@ -294,7 +423,7 @@
       applyFilters();
     });
 
-    /* ── ⑥ Toggle grille / liste ────────────────────────────── */
+    /* ── Toggle grille / liste ──────────────────────────────── */
     document.getElementById('btn-grid').addEventListener('click', function () {
       document.getElementById('grid').classList.remove('list-view');
       this.classList.add('active');
@@ -306,6 +435,10 @@
       this.classList.add('active');
       document.getElementById('btn-grid').classList.remove('active');
     });
+
+    /* ── Action bar ─────────────────────────────────────────── */
+    document.getElementById('btn-clear-selection').addEventListener('click', clearSelection);
+    document.getElementById('btn-send-selection').addEventListener('click', sendToSelected);
 
     /* ── Chargement API ─────────────────────────────────────── */
     async function loadCandidatures() {
@@ -326,36 +459,6 @@
         updateStats(allCandidatures);
       } catch {
         grid.innerHTML = '<p class="loading">Erreur de chargement.</p>';
-      }
-    }
-
-    /* ── ③ Sélectionner — transformation de la carte ────────── */
-    async function selectModel(btn) {
-      const card = btn.closest('.card');
-      const { email, prenom, nom } = btn.dataset;
-      if (!confirm(`Envoyer l'email de sélection à ${prenom} ${nom} ?`)) return;
-
-      btn.disabled = true;
-      btn.textContent = 'Envoi en cours…';
-
-      try {
-        const res = await fetch('/api/select', {
-          method: 'POST',
-          headers: {
-            'Content-Type':  'application/json',
-            'Authorization': `Bearer ${adminToken}`,
-          },
-          body: JSON.stringify({ email, prenom, nom }),
-        });
-        const json = await res.json();
-        if (!json.success) throw new Error(json.message);
-        btn.textContent = 'Email envoyé ✓';
-        btn.classList.add('sent');
-        card.classList.add('is-selected');
-      } catch (err) {
-        alert('Erreur : ' + (err.message || 'réessaie.'));
-        btn.disabled = false;
-        btn.textContent = 'Sélectionner ce modèle';
       }
     }
 
