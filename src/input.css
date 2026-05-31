@@ -1381,13 +1381,13 @@
   /* ── OTP — 6 cases individuelles ───────────────────────── */
   .otp-boxes {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     justify-content: center;
     margin: 4px 0 4px;
   }
   .otp-box {
-    width: 42px;
-    height: 52px;
+    width: 34px;
+    height: 48px;
     text-align: center;
     font-size: 1.4rem;
     font-weight: 700;
