@@ -1389,9 +1389,10 @@
     width: 42px;
     height: 52px;
     text-align: center;
-    font-size: 1.5rem;
-    font-weight: 600;
-    font-family: var(--font-titre);
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: var(--font-corps); /* DM Sans — chiffres nets et lisibles */
+    letter-spacing: 0.02em;
     border: 1.5px solid var(--gris-bord);
     border-radius: var(--radius);
     outline: none;
@@ -1399,7 +1400,7 @@
     color: var(--noir);
     background: var(--blanc);
     padding: 0;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
   .otp-box:focus {
     border-color: var(--rouge);
@@ -1407,7 +1408,8 @@
   }
   .otp-box.filled {
     border-color: var(--rouge);
-    color: var(--rouge);
+    color: var(--noir); /* chiffre reste noir — maximal contraste */
+    background: rgba(212, 41, 58, 0.04); /* fond légèrement teinté rouge */
   }
 
   /* ── SHAKE SUR ERREUR ───────────────────────────────────── */
