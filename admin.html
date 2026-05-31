@@ -134,14 +134,119 @@
         <span id="selection-count">0 sélectionné</span>
         <button class="action-bar-clear" id="btn-clear-selection">Tout désélectionner</button>
       </div>
-      <button class="action-bar-btn" id="btn-send-selection">
-        Envoyer la sélection
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="margin-left:8px;vertical-align:-2px">
-          <path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <!-- Étape 1 : notification simple "vous êtes sélectionné(e)" -->
+        <button class="action-bar-btn-notify" id="btn-notify">Notifier</button>
+        <!-- Étape 2 : composer avec tous les détails de la session -->
+        <button class="action-bar-btn" id="btn-open-composer">
+          Détails de la session
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" style="margin-left:7px;vertical-align:-2px" aria-hidden="true">
+            <path d="M1 6.5h11M6.5 1l5.5 5.5-5.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
+
+  <!-- ── COMPOSER DE SESSION ────────────────────────────────── -->
+  <div class="composer-overlay" id="composer-overlay" role="dialog" aria-modal="true" aria-labelledby="composer-title">
+    <div class="composer">
+
+      <div class="composer-header">
+        <div>
+          <div class="composer-title" id="composer-title">Composer le message</div>
+          <div class="composer-subtitle" id="composer-subtitle"></div>
+        </div>
+        <button class="composer-close" id="composer-close" aria-label="Fermer">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M1 1l14 14M15 1L1 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Formulaire -->
+      <div class="composer-body" id="composer-form">
+
+        <div class="crow">
+          <div class="cfield">
+            <label class="clabel" for="c-project">Nom du projet</label>
+            <input type="text" id="c-project" placeholder="ex : Maison Locht SS26" />
+          </div>
+          <div class="cfield">
+            <label class="clabel" for="c-date">Date</label>
+            <input type="text" id="c-date" placeholder="ex : 17 mai 2026 / May 17, 2026" />
+          </div>
+        </div>
+
+        <div class="cfield">
+          <label class="clabel" for="c-addr-fr">Adresse (FR)</label>
+          <input type="text" id="c-addr-fr" placeholder="3081 Rue Ontario Est, suite 303 (Préfontaine)" />
+        </div>
+        <div class="cfield">
+          <label class="clabel" for="c-addr-en">Adresse (EN)</label>
+          <input type="text" id="c-addr-en" placeholder="3081 Ontario Street East, Suite 303" />
+        </div>
+
+        <div class="cfield-header">
+          <span class="clabel">Groupes &amp; call times</span>
+          <button class="c-link-btn" id="c-add-group">+ Ajouter un groupe</button>
+        </div>
+        <div class="c-group-labels">
+          <span class="c-glabel">Nom du groupe</span>
+          <span class="c-glabel">Heure</span>
+          <span class="c-glabel">Modèles (séparés par des virgules)</span>
+        </div>
+        <div id="c-groups"></div>
+
+        <div class="crow" style="margin-top:4px">
+          <div class="cfield">
+            <label class="clabel" for="c-notes-fr">Notes FR <span class="clabel-opt">optionnel</span></label>
+            <textarea id="c-notes-fr" rows="2" placeholder="Ex : Veuillez apporter vos chaussures noires."></textarea>
+          </div>
+          <div class="cfield">
+            <label class="clabel" for="c-notes-en">Notes EN <span class="clabel-opt">optional</span></label>
+            <textarea id="c-notes-en" rows="2" placeholder="Ex : Please bring your black shoes."></textarea>
+          </div>
+        </div>
+
+        <div class="c-options">
+          <label class="c-toggle-row">
+            <input type="checkbox" id="c-unpaid" checked />
+            <span>Participation non rémunérée + droits à l'image</span>
+          </label>
+          <label class="c-toggle-row">
+            <input type="checkbox" id="c-moodboard" checked />
+            <span>Moodboard joint au courriel</span>
+          </label>
+          <div>
+            <label class="c-toggle-row">
+              <input type="checkbox" id="c-wa-toggle" />
+              <span>Lien WhatsApp</span>
+            </label>
+            <input type="text" id="c-wa-link" class="c-wa-input" style="display:none"
+                   placeholder="https://chat.whatsapp.com/…" />
+          </div>
+        </div>
+
+      </div>
+      <!-- Fin formulaire -->
+
+      <!-- Aperçu -->
+      <div class="c-preview-pane" id="c-preview-pane"></div>
+
+      <div class="composer-footer">
+        <button class="c-btn-preview" id="c-btn-preview">Prévisualiser</button>
+        <button class="c-btn-send" id="c-btn-send">
+          Envoyer
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+            <path d="M1 6.5h11M6.5 1l5.5 5.5-5.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <!-- Fin composer -->
 
   <!-- Toast de notification -->
   <div class="toast" id="toast"></div>
@@ -287,14 +392,14 @@
       updateActionBar();
     }
 
-    /* ── Envoi groupé ───────────────────────────────────────── */
-    async function sendToSelected() {
-      const btn    = document.getElementById('btn-send-selection');
+    /* ── Étape 1 : notification simple "vous êtes sélectionné(e)" ── */
+    async function sendNotify() {
+      const btn    = document.getElementById('btn-notify');
       const models = [...selectedModels.entries()];
-      if (models.length === 0) return;
+      if (!models.length) return;
 
       btn.disabled    = true;
-      btn.textContent = `Envoi en cours…`;
+      btn.textContent = 'Envoi…';
 
       const results = await Promise.allSettled(
         models.map(([email, { prenom, nom }]) =>
@@ -309,15 +414,13 @@
         )
       );
 
-      let success = 0;
-      let fail    = 0;
+      let success = 0, fail = 0;
 
       results.forEach(result => {
         if (result.status === 'fulfilled' && result.value.ok) {
           const email = result.value.email;
           sentEmails.add(email);
           success++;
-          /* Marquer la carte comme envoyée */
           document.querySelectorAll('.btn-check').forEach(b => {
             if (b.dataset.email === email) {
               const card = b.closest('.card');
@@ -327,23 +430,215 @@
               b.disabled = true;
             }
           });
-        } else {
-          fail++;
-        }
+        } else { fail++; }
       });
 
       selectedModels.clear();
       updateActionBar();
-
       btn.disabled    = false;
-      btn.innerHTML   = 'Envoyer la sélection <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="margin-left:8px;vertical-align:-2px"><path d="M1 7h12M7 1l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      btn.textContent = 'Notifier';
 
-      if (fail === 0) {
-        showToast(`${success} email${success > 1 ? 's' : ''} envoyé${success > 1 ? 's' : ''} ✓`, 'success');
+      if (fail === 0) showToast(`${success} notification${success > 1 ? 's' : ''} envoyée${success > 1 ? 's' : ''} ✓`, 'success');
+      else            showToast(`${success} envoyée${success > 1 ? 's' : ''} · ${fail} échec${fail > 1 ? 's' : ''}`, 'error');
+    }
+
+    /* ── Étape 2 : composer de session ──────────────────────── */
+    let _groupCount  = 0;
+    let _previewMode = false;
+
+    function openComposer() {
+      const count = selectedModels.size;
+      if (!count) return;
+
+      _groupCount  = 0;
+      _previewMode = false;
+
+      document.getElementById('composer-subtitle').textContent =
+        `${count} modèle${count > 1 ? 's' : ''} sélectionné${count > 1 ? 's' : ''}`;
+
+      /* Pré-remplir le groupe 1 avec les prénoms sélectionnés */
+      document.getElementById('c-groups').innerHTML = '';
+      const names = [...selectedModels.values()].map(m => m.prenom).join(', ');
+      addGroup(names, '', '');
+
+      /* Réinitialiser vue */
+      document.getElementById('composer-form').style.display   = '';
+      document.getElementById('c-preview-pane').style.display  = 'none';
+      document.getElementById('c-btn-preview').textContent     = 'Prévisualiser';
+
+      const sendBtn    = document.getElementById('c-btn-send');
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = `Envoyer à ${count} modèle${count > 1 ? 's' : ''} <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M1 6.5h11M6.5 1l5.5 5.5-5.5 5.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+      document.getElementById('composer-overlay').classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeComposer() {
+      document.getElementById('composer-overlay').classList.remove('visible');
+      document.body.style.overflow = '';
+    }
+
+    function addGroup(defaultMembers = '', defaultName = '', defaultTime = '') {
+      _groupCount++;
+      const isFirst = _groupCount === 1;
+      const el = document.createElement('div');
+      el.className = 'c-group';
+      el.innerHTML = `
+        <div class="c-group-fields">
+          <input class="c-group-name"    type="text" placeholder="ex : Filles" />
+          <input class="c-group-time"    type="text" placeholder="08h30" />
+          <input class="c-group-members" type="text" placeholder="Sara, Luna…" />
+        </div>
+        ${!isFirst ? '<button class="c-remove-group" aria-label="Supprimer ce groupe">✕</button>' : ''}
+      `;
+      el.querySelector('.c-group-name').value    = defaultName;
+      el.querySelector('.c-group-time').value    = defaultTime;
+      el.querySelector('.c-group-members').value = defaultMembers;
+      if (!isFirst) el.querySelector('.c-remove-group').addEventListener('click', () => el.remove());
+      document.getElementById('c-groups').appendChild(el);
+    }
+
+    function getComposerData() {
+      const groups = [...document.querySelectorAll('.c-group')].map(g => ({
+        name:    g.querySelector('.c-group-name').value.trim(),
+        time:    g.querySelector('.c-group-time').value.trim(),
+        members: g.querySelector('.c-group-members').value.trim(),
+      }));
+      return {
+        models:    [...selectedModels.entries()].map(([email, { prenom, nom }]) => ({ email, prenom, nom })),
+        project:   document.getElementById('c-project').value.trim(),
+        date:      document.getElementById('c-date').value.trim(),
+        addressFr: document.getElementById('c-addr-fr').value.trim(),
+        addressEn: document.getElementById('c-addr-en').value.trim(),
+        groups,
+        notesFr:   document.getElementById('c-notes-fr').value.trim(),
+        notesEn:   document.getElementById('c-notes-en').value.trim(),
+        unpaid:    document.getElementById('c-unpaid').checked,
+        moodboard: document.getElementById('c-moodboard').checked,
+        whatsapp:  document.getElementById('c-wa-toggle').checked ? document.getElementById('c-wa-link').value.trim() : '',
+      };
+    }
+
+    function buildPreview(data) {
+      const groupLines = data.groups
+        .filter(g => g.time || g.members || g.name)
+        .map(g => {
+          const label = [g.name, g.members ? `(${g.members})` : ''].filter(Boolean).join(' ');
+          return `<div style="margin-bottom:4px"><strong>${label}</strong>${g.time ? ` — ${g.time}` : ''}</div>`;
+        }).join('');
+
+      return `
+        <span class="preview-lang-label">Aperçu — version française</span>
+        <div class="preview-email-box">
+          <p>Bonsoir <strong>[Prénom]</strong>,</p>
+          <p>J'espère que vous allez bien.<br>
+          Vous avez été sélectionné(e) pour participer au photoshoot
+          <strong>${data.project || '[Nom du projet]'}</strong>, qui se tiendra le
+          <strong>${data.date || '[Date]'}</strong>.
+          Nous sommes ravis(es) de vous avoir à bord.</p>
+          <span class="preview-section-label">📍 Lieu</span>
+          <p>${data.addressFr || '<em style="color:#b0b0b0">[Adresse FR]</em>'}</p>
+          <span class="preview-section-label">🕐 Heure de call time</span>
+          <div style="margin-bottom:14px">${groupLines || '<em style="color:#b0b0b0">[Groupes]</em>'}</div>
+          ${data.moodboard ? '<p>Le moodboard est joint à ce courriel.</p>' : ''}
+          ${data.notesFr   ? `<p>${data.notesFr}</p>` : ''}
+          ${data.whatsapp  ? `<p>Lien WhatsApp : ${data.whatsapp}</p>` : ''}
+          <p>Merci de répondre à ce courriel pour confirmer votre présence.</p>
+          ${data.unpaid ? '<p style="font-size:0.85em;color:var(--gris-texte)">Veuillez noter que cette participation est non rémunérée. Un contrat d\'autorisation de droits à l\'image vous sera remis à l\'issue de la session.</p>' : ''}
+          <p>Au plaisir de vous retrouver !</p>
+          <hr class="preview-divider" />
+          <p style="color:var(--gris-texte);font-size:0.85em">— La version anglaise suit dans le même email —</p>
+          <div class="preview-email-signature">
+            <strong style="font-family:var(--font-titre);letter-spacing:0.06em">Lumina</strong> Photography<br>
+            casting@luminamodels.ca · luminamodels.ca · Montréal
+          </div>
+        </div>
+        <p style="font-size:0.76rem;color:var(--gris-texte);margin-top:10px;text-align:center">
+          Destinataires : ${data.models.map(m => m.prenom).join(', ')}
+        </p>
+      `;
+    }
+
+    function togglePreview() {
+      _previewMode = !_previewMode;
+      if (_previewMode) {
+        document.getElementById('c-preview-pane').innerHTML = buildPreview(getComposerData());
+        document.getElementById('composer-form').style.display  = 'none';
+        document.getElementById('c-preview-pane').style.display = 'block';
+        document.getElementById('c-btn-preview').textContent    = '← Retour';
       } else {
-        showToast(`${success} envoyé${success > 1 ? 's' : ''} · ${fail} échec${fail > 1 ? 's' : ''}`, 'error');
+        document.getElementById('composer-form').style.display  = '';
+        document.getElementById('c-preview-pane').style.display = 'none';
+        document.getElementById('c-btn-preview').textContent    = 'Prévisualiser';
       }
     }
+
+    async function sendSession() {
+      const data    = getComposerData();
+      const sendBtn = document.getElementById('c-btn-send');
+
+      if (!data.project)   return showToast('Ajoute le nom du projet.', 'error');
+      if (!data.date)      return showToast('Ajoute la date.', 'error');
+      if (!data.addressFr) return showToast("Ajoute l'adresse (FR).", 'error');
+
+      const savedHTML   = sendBtn.innerHTML;
+      sendBtn.disabled  = true;
+      sendBtn.innerHTML = 'Envoi en cours…';
+
+      try {
+        const res  = await fetch('/api/send-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type':  'application/json',
+            'Authorization': `Bearer ${adminToken}`,
+          },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message);
+
+        data.models.forEach(({ email }) => {
+          sentEmails.add(email);
+          document.querySelectorAll('.btn-check').forEach(b => {
+            if (b.dataset.email === email) {
+              const card = b.closest('.card');
+              card.classList.add('is-selected');
+              card.classList.remove('card-checked');
+              b.classList.remove('checked');
+              b.disabled = true;
+            }
+          });
+        });
+
+        clearSelection();
+        closeComposer();
+        showToast(`Session envoyée à ${json.sent} modèle${json.sent > 1 ? 's' : ''} ✓`, 'success');
+
+      } catch {
+        showToast("Erreur lors de l'envoi. Réessaie.", 'error');
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = savedHTML;
+      }
+    }
+
+    /* Événements du composer */
+    document.getElementById('composer-close').addEventListener('click', closeComposer);
+    document.getElementById('composer-overlay').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeComposer();
+    });
+    document.getElementById('c-add-group').addEventListener('click', () => addGroup());
+    document.getElementById('c-btn-preview').addEventListener('click', togglePreview);
+    document.getElementById('c-btn-send').addEventListener('click', sendSession);
+    document.getElementById('c-wa-toggle').addEventListener('change', function () {
+      document.getElementById('c-wa-link').style.display = this.checked ? 'block' : 'none';
+      if (this.checked) document.getElementById('c-wa-link').focus();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById('composer-overlay').classList.contains('visible')) {
+        closeComposer();
+      }
+    });
 
     /* ── Toast de notification ──────────────────────────────── */
     let toastTimer;
@@ -438,7 +733,8 @@
 
     /* ── Action bar ─────────────────────────────────────────── */
     document.getElementById('btn-clear-selection').addEventListener('click', clearSelection);
-    document.getElementById('btn-send-selection').addEventListener('click', sendToSelected);
+    document.getElementById('btn-notify').addEventListener('click', sendNotify);
+    document.getElementById('btn-open-composer').addEventListener('click', openComposer);
 
     /* ── Chargement API ─────────────────────────────────────── */
     async function loadCandidatures() {
