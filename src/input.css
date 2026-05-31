@@ -911,6 +911,11 @@
     flex-shrink: 0;
   }
 
+  @keyframes pulse {
+    0%, 100% { opacity: 1;   transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.75); }
+  }
+
   .action-bar-dot {
     width: 8px;
     height: 8px;
@@ -1381,8 +1386,8 @@
     margin: 4px 0 4px;
   }
   .otp-box {
-    width: 36px;
-    height: 48px;
+    width: 42px;
+    height: 52px;
     text-align: center;
     font-size: 1.5rem;
     font-weight: 600;
