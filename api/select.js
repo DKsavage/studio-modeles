@@ -35,16 +35,39 @@ module.exports = async function handler(req, res) {
       reply_to: 'luminaphotography.mtl@gmail.com',
       to:       [email],
       subject:  'Félicitations — Tu as été sélectionné(e) par Lumina Photography',
-      html: `
-        <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; color: #0a0a0a;">
-          <h1 style="font-weight: 300; font-size: 2rem; margin-bottom: 8px;">Lumina Photography</h1>
-          <p style="color: #6b6b6b; margin-bottom: 32px;">Agence de mannequinat</p>
-          <p>Bonjour <strong>${prenom}</strong>,</p>
-          <p>Nous avons le plaisir de t'informer que ton profil a été <strong>sélectionné</strong> pour un projet Lumina Photography.</p>
-          <p>Un membre de notre équipe te contactera très prochainement pour te donner tous les détails.</p>
-          <p style="color: #6b6b6b; font-size: 0.9rem; margin-top: 40px; border-top: 1px solid #e5e5e5; padding-top: 20px;">L'équipe Lumina Photography<br/>casting@luminamodels.ca</p>
-        </div>
-      `,
+      html: `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f3f3f3;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f3f3f3;padding:32px 16px;">
+<tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+  <tr><td style="height:4px;background:#d4293a;"></td></tr>
+  <tr><td style="padding:28px 40px 0;">
+    <span style="font-family:Georgia,serif;font-size:20px;letter-spacing:0.12em;text-transform:uppercase;color:#d4293a;font-weight:700;">Lumina</span>
+    <span style="font-family:Georgia,serif;font-size:14px;letter-spacing:0.2em;text-transform:uppercase;color:#0a0a0a;font-weight:300;margin-left:6px;">Photography</span>
+  </td></tr>
+  <tr><td style="padding:24px 40px 32px;">
+    <p style="margin:0 0 14px;font-size:15px;color:#0a0a0a;line-height:1.7;">Bonjour <strong>${prenom}</strong>,</p>
+    <p style="margin:0 0 14px;font-size:15px;color:#0a0a0a;line-height:1.7;">Nous avons le plaisir de t'informer que ton profil a été <strong>sélectionné</strong> pour un projet Lumina Photography.</p>
+    <p style="margin:0 0 14px;font-size:15px;color:#0a0a0a;line-height:1.7;">Tu recevras très prochainement tous les détails concernant la session (date, lieu, heure de call time).</p>
+    <p style="margin:0 0 32px;font-size:15px;color:#0a0a0a;line-height:1.7;"><strong>Merci de répondre à cet email pour confirmer ta disponibilité.</strong></p>
+    <hr style="border:none;border-top:1px solid #e2e2e2;margin:0 0 20px;">
+    <p style="margin:0 0 14px;font-size:15px;color:#0a0a0a;line-height:1.7;">Hi <strong>${prenom}</strong>,</p>
+    <p style="margin:0 0 14px;font-size:15px;color:#0a0a0a;line-height:1.7;">We're pleased to let you know that your profile has been <strong>selected</strong> for a Lumina Photography project.</p>
+    <p style="margin:0 0 14px;font-size:15px;color:#0a0a0a;line-height:1.7;">You will receive all the details about the session (date, location, call time) very soon.</p>
+    <p style="margin:0 0 0;font-size:15px;color:#0a0a0a;line-height:1.7;"><strong>Please reply to this email to confirm your availability.</strong></p>
+  </td></tr>
+  <tr><td style="padding:0 40px 28px;">
+    <div style="border-top:1px solid #e2e2e2;padding-top:16px;">
+      <span style="font-family:Georgia,serif;font-size:15px;letter-spacing:0.08em;text-transform:uppercase;color:#d4293a;font-weight:700;">Lumina</span>
+      <span style="font-family:Georgia,serif;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#0a0a0a;font-weight:300;margin-left:4px;">Photography</span>
+      <div style="font-size:12px;color:#6b6b6b;margin-top:4px;">casting@luminamodels.ca &nbsp;·&nbsp; luminamodels.ca</div>
+    </div>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body></html>`,
     }),
   });
 

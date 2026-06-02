@@ -1535,6 +1535,7 @@
   }
 
   .cfield input[type="text"],
+  .cfield input[type="date"],
   .cfield textarea {
     padding: 10px 13px;
     border: 1.5px solid var(--gris-bord);
@@ -1551,6 +1552,7 @@
   }
 
   .cfield input[type="text"]:focus,
+  .cfield input[type="date"]:focus,
   .cfield textarea:focus {
     border-color: var(--rouge);
     box-shadow: 0 0 0 3px var(--rouge-light);

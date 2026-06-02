@@ -174,17 +174,13 @@
           </div>
           <div class="cfield">
             <label class="clabel" for="c-date">Date</label>
-            <input type="text" id="c-date" placeholder="ex : 17 mai 2026 / May 17, 2026" />
+            <input type="date" id="c-date" />
           </div>
         </div>
 
         <div class="cfield">
-          <label class="clabel" for="c-addr-fr">Adresse (FR)</label>
+          <label class="clabel" for="c-addr-fr">Adresse</label>
           <input type="text" id="c-addr-fr" placeholder="3081 Rue Ontario Est, suite 303 (Préfontaine)" />
-        </div>
-        <div class="cfield">
-          <label class="clabel" for="c-addr-en">Adresse (EN)</label>
-          <input type="text" id="c-addr-en" placeholder="3081 Ontario Street East, Suite 303" />
         </div>
 
         <div class="cfield-header">
@@ -418,11 +414,11 @@
 
       results.forEach(result => {
         if (result.status === 'fulfilled' && result.value.ok) {
-          const email = result.value.email;
+          const email = result.value.email.trim().toLowerCase();
           sentEmails.add(email);
           success++;
           document.querySelectorAll('.btn-check').forEach(b => {
-            if (b.dataset.email === email) {
+            if (b.dataset.email.trim().toLowerCase() === email) {
               const card = b.closest('.card');
               card.classList.add('is-selected');
               card.classList.remove('card-checked');
@@ -440,6 +436,15 @@
 
       if (fail === 0) showToast(`${success} notification${success > 1 ? 's' : ''} envoyée${success > 1 ? 's' : ''} ✓`, 'success');
       else            showToast(`${success} envoyée${success > 1 ? 's' : ''} · ${fail} échec${fail > 1 ? 's' : ''}`, 'error');
+    }
+
+    /* ── Formatage de date bilingue ────────────────────────── */
+    function formatDateBilingual(isoDate) {
+      if (!isoDate) return { fr: '', en: '' };
+      const d = new Date(isoDate + 'T12:00:00');
+      const fr = d.toLocaleDateString('fr-CA', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      const en = d.toLocaleDateString('en-CA', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      return { fr, en };
     }
 
     /* ── Étape 2 : composer de session ──────────────────────── */
@@ -505,12 +510,13 @@
         time:    g.querySelector('.c-group-time').value.trim(),
         members: g.querySelector('.c-group-members').value.trim(),
       }));
+      const { fr: dateFr, en: dateEn } = formatDateBilingual(document.getElementById('c-date').value);
       return {
         models:    [...selectedModels.entries()].map(([email, { prenom, nom }]) => ({ email, prenom, nom })),
         project:   document.getElementById('c-project').value.trim(),
-        date:      document.getElementById('c-date').value.trim(),
+        dateFr,
+        dateEn,
         addressFr: document.getElementById('c-addr-fr').value.trim(),
-        addressEn: document.getElementById('c-addr-en').value.trim(),
         groups,
         notesFr:   document.getElementById('c-notes-fr').value.trim(),
         notesEn:   document.getElementById('c-notes-en').value.trim(),
@@ -535,7 +541,7 @@
           <p>J'espère que vous allez bien.<br>
           Vous avez été sélectionné(e) pour participer au photoshoot
           <strong>${data.project || '[Nom du projet]'}</strong>, qui se tiendra le
-          <strong>${data.date || '[Date]'}</strong>.
+          <strong>${data.dateFr || '[Date]'}</strong>.
           Nous sommes ravis(es) de vous avoir à bord.</p>
           <span class="preview-section-label">📍 Lieu</span>
           <p>${data.addressFr || '<em style="color:#b0b0b0">[Adresse FR]</em>'}</p>
@@ -579,8 +585,8 @@
       const sendBtn = document.getElementById('c-btn-send');
 
       if (!data.project)   return showToast('Ajoute le nom du projet.', 'error');
-      if (!data.date)      return showToast('Ajoute la date.', 'error');
-      if (!data.addressFr) return showToast("Ajoute l'adresse (FR).", 'error');
+      if (!data.dateFr)    return showToast('Sélectionne la date.', 'error');
+      if (!data.addressFr) return showToast("Ajoute l'adresse.", 'error');
 
       const savedHTML   = sendBtn.innerHTML;
       sendBtn.disabled  = true;
@@ -599,9 +605,10 @@
         if (!json.success) throw new Error(json.message);
 
         data.models.forEach(({ email }) => {
-          sentEmails.add(email);
+          const normalizedEmail = email.trim().toLowerCase();
+          sentEmails.add(normalizedEmail);
           document.querySelectorAll('.btn-check').forEach(b => {
-            if (b.dataset.email === email) {
+            if (b.dataset.email.trim().toLowerCase() === normalizedEmail) {
               const card = b.closest('.card');
               card.classList.add('is-selected');
               card.classList.remove('card-checked');

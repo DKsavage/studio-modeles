@@ -19,15 +19,15 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ success: false, message: 'Session expirée. Reconnecte-toi.' });
   }
 
-  const { models, project, date, addressFr, addressEn, groups, notesFr, notesEn, unpaid, moodboard, whatsapp } = req.body;
+  const { models, project, dateFr, dateEn, addressFr, groups, notesFr, notesEn, unpaid, moodboard, whatsapp } = req.body;
 
-  if (!models?.length || !project || !date || !addressFr) {
+  if (!models?.length || !project || !dateFr || !addressFr) {
     return res.status(400).json({ success: false, message: 'Données manquantes.' });
   }
 
   const results = await Promise.allSettled(
     models.map(({ email, prenom }) => {
-      const html = buildEmailHtml({ prenom, project, date, addressFr, addressEn, groups, notesFr, notesEn, unpaid, moodboard, whatsapp });
+      const html = buildEmailHtml({ prenom, project, dateFr, dateEn, addressFr, groups, notesFr, notesEn, unpaid, moodboard, whatsapp });
       return fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -52,8 +52,8 @@ module.exports = async function handler(req, res) {
 };
 
 /* ── Construction de l'email HTML bilingual ────────────────── */
-function buildEmailHtml({ prenom, project, date, addressFr, addressEn, groups, notesFr, notesEn, unpaid, moodboard, whatsapp }) {
-  const addrEn = addressEn || addressFr;
+function buildEmailHtml({ prenom, project, dateFr, dateEn, addressFr, groups, notesFr, notesEn, unpaid, moodboard, whatsapp }) {
+  const addrEn = addressFr;
 
   const groupRowsFr = (groups || [])
     .filter(g => g.name || g.time || g.members)
@@ -108,7 +108,7 @@ function buildEmailHtml({ prenom, project, date, addressFr, addressEn, groups, n
     <p style="margin:0 0 16px;font-size:15px;color:#0a0a0a;line-height:1.7;">Bonsoir ${esc(prenom)},</p>
     <p style="margin:0 0 24px;font-size:15px;color:#0a0a0a;line-height:1.7;">
       J'espère que vous allez bien.<br>
-      Vous avez été sélectionné(e) pour participer au photoshoot <strong>${esc(project)}</strong>, qui se tiendra le <strong>${esc(date)}</strong>.
+      Vous avez été sélectionné(e) pour participer au photoshoot <strong>${esc(project)}</strong>, qui se tiendra le <strong>${esc(dateFr)}</strong>.
       Nous sommes ravis(es) de vous avoir à bord et vous remercions d'avance pour votre temps.
     </p>
 
@@ -134,7 +134,7 @@ function buildEmailHtml({ prenom, project, date, addressFr, addressEn, groups, n
     <p style="margin:0 0 16px;font-size:15px;color:#0a0a0a;line-height:1.7;">Hi ${esc(prenom)},</p>
     <p style="margin:0 0 24px;font-size:15px;color:#0a0a0a;line-height:1.7;">
       I hope you're doing well.<br>
-      You have been selected to participate in the <strong>${esc(project)}</strong> photoshoot, taking place on <strong>${esc(date)}</strong>.
+      You have been selected to participate in the <strong>${esc(project)}</strong> photoshoot, taking place on <strong>${esc(dateEn || dateFr)}</strong>.
       We're so excited to have you and thank you in advance for your time!
     </p>
 
