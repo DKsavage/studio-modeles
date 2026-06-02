@@ -69,3 +69,9 @@ temp.*
 secrets.json
 config.private.js
 .vercel
+
+# Graphify — fichiers générés (carte du projet, cache, visualisation)
+graphify-out/
+
+# Lockfile npm (projet solo, pas nécessaire en repo)
+package-lock.json
