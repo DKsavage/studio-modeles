@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lumina — Version B: Immersif Plein Écran</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --W:#FFFFFF; --B:#000000; --R:#C4001F; --R2:#E8002A;
+  --IV:#F8F4EE; --GD:rgba(255,255,255,.5);
+  --F:'Playfair Display',serif; --S:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--B);color:var(--W);font-family:var(--S);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+
+/* ── NAV TRANSPARENT ────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:2rem 3.5rem;
+}
+.logo{font-family:var(--F);font-size:1rem;font-weight:700;letter-spacing:.45em;text-transform:uppercase;color:var(--W);}
+.logo em{color:var(--R);font-style:normal;}
+.nav-cta{
+  font-size:.6rem;font-weight:500;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--W);border:1px solid rgba(255,255,255,.3);
+  padding:.5rem 1.2rem;transition:all .25s;
+}
+.nav-cta:hover{background:var(--R);border-color:var(--R);}
+
+/* ══════════════════════════════════
+   HERO — PLEIN ÉCRAN avec photos
+   Les photos défilent DERRIÈRE TOUT
+══════════════════════════════════ */
+.hero{
+  position:relative;min-height:100vh;
+  display:flex;align-items:stretch;
+  overflow:hidden;
+}
+
+/* SLIDESHOW PLEIN ÉCRAN */
+.bg-reel{position:absolute;inset:0;z-index:0;}
+.bg-slide{
+  position:absolute;inset:0;opacity:0;
+  transition:opacity 2s cubic-bezier(.4,0,.2,1);
+  background-size:cover;background-position:center;
+}
+.bg-slide.active{opacity:1;}
+
+/* Real photos full bleed — replace with actual model shots */
+.b1{background-image:url('https://picsum.photos/seed/imm1/1600/1000');}
+.b2{background-image:url('https://picsum.photos/seed/imm2/1600/1000');}
+.b3{background-image:url('https://picsum.photos/seed/imm3/1600/1000');}
+.b4{background-image:url('https://picsum.photos/seed/imm4/1600/1000');}
+
+/* Dark overlay gradient layers */
+.bg-reel::after{
+  content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(to right, rgba(0,0,0,.75) 0%, rgba(0,0,0,.3) 50%, rgba(0,0,0,.82) 100%),
+    linear-gradient(to bottom, rgba(0,0,0,.4) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,.7) 100%);
+  z-index:1;
+}
+
+/* vignette grain */
+.bg-reel::before{
+  content:'';position:absolute;inset:0;z-index:2;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.025;pointer-events:none;
+}
+
+/* Hero content grid: left copy / right form */
+.hero-inner{
+  position:relative;z-index:10;
+  width:100%;display:grid;
+  grid-template-columns:1fr 420px;
+  gap:0;padding:0;
+  align-items:stretch;
+}
+
+/* LEFT: large editorial copy */
+.hero-copy{
+  display:flex;flex-direction:column;
+  justify-content:flex-end;
+  padding:8rem 4rem 4rem;
+}
+
+.eyebrow{
+  font-size:.58rem;font-weight:500;letter-spacing:.32em;text-transform:uppercase;
+  color:rgba(255,255,255,.55);margin-bottom:1.2rem;
+  display:flex;align-items:center;gap:.7rem;
+}
+.eyebrow::before{content:'';width:2.5rem;height:1px;background:var(--R);}
+
+.hero-title{
+  font-family:var(--F);
+  font-size:clamp(3.5rem,6.5vw,7rem);
+  font-weight:400;font-style:italic;
+  line-height:.95;letter-spacing:-.02em;
+  color:var(--W);margin-bottom:1.5rem;
+}
+
+.hero-title strong{
+  font-weight:900;font-style:normal;
+  display:block;color:var(--R);
+}
+
+.hero-sub{
+  font-size:.88rem;font-weight:200;line-height:1.75;
+  color:rgba(255,255,255,.55);max-width:380px;
+  margin-bottom:2.5rem;
+}
+
+/* slide dots */
+.dots{display:flex;gap:.5rem;align-items:center;}
+.dot{
+  width:1.8rem;height:2px;background:rgba(255,255,255,.25);
+  cursor:pointer;transition:all .3s;
+}
+.dot.active{background:var(--R);width:3rem;}
+
+/* photo credit */
+.photo-credit{
+  position:absolute;bottom:2rem;left:4rem;
+  font-size:.5rem;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.2);
+}
+
+/* ── RIGHT FORM STRIP ────────────────
+   FORMULAIRE: bandeau vertical droit
+   bord gauche rouge
+──────────────────────────────────── */
+.form-strip{
+  background:rgba(0,0,0,.82);
+  border-left:2px solid var(--R);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;
+  padding:7rem 2.5rem 3rem;
+  overflow-y:auto;
+  max-height:100vh;
+}
+
+.fs-eyebrow{
+  font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--R);margin-bottom:.6rem;
+}
+
+.fs-title{
+  font-family:var(--F);font-size:1.7rem;font-weight:700;
+  line-height:1.05;color:var(--W);margin-bottom:1.6rem;
+}
+
+/* STEPPER - horizontal mini */
+.mini-steps{
+  display:flex;gap:.4rem;margin-bottom:1.8rem;
+}
+.ms{
+  flex:1;height:2px;background:rgba(255,255,255,.1);
+  position:relative;overflow:hidden;transition:background .3s;
+}
+.ms.active{background:var(--R);}
+.ms.done{background:rgba(196,0,31,.4);}
+.ms-lbl{
+  font-size:.5rem;letter-spacing:.15em;text-transform:uppercase;
+  color:rgba(255,255,255,.25);text-align:center;margin-top:.4rem;
+}
+.ms.active .ms-lbl{color:rgba(255,255,255,.65);}
+
+/* UPLOAD */
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-bottom:1.3rem;}
+.upload{
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);
+  padding:1.5rem .8rem;display:flex;flex-direction:column;align-items:center;gap:.4rem;
+  cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.upload:hover{border-color:rgba(196,0,31,.5);background:rgba(196,0,31,.06);}
+.up-ico{
+  font-size:.75rem;color:var(--R);
+  width:1.8rem;height:1.8rem;
+  border:1px solid rgba(196,0,31,.3);
+  display:flex;align-items:center;justify-content:center;
+}
+.up-t{font-size:.58rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6);text-align:center;}
+.up-s{font-size:.52rem;color:rgba(255,255,255,.25);text-align:center;}
+
+/* FIELDS */
+.fields{display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.2rem;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+.fld{display:flex;flex-direction:column;gap:.3rem;}
+.fld label{font-size:.53rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);}
+.fld label .r{color:var(--R);}
+.fld input,.fld select{
+  background:rgba(255,255,255,.05);border:none;
+  border-bottom:1px solid rgba(255,255,255,.12);
+  color:var(--W);font-family:var(--S);font-size:.82rem;font-weight:300;
+  padding:.5rem .6rem;outline:none;transition:border-color .2s;
+  -webkit-appearance:none;width:100%;
+}
+.fld input:focus,.fld select:focus{border-bottom-color:var(--R);background:rgba(196,0,31,.06);}
+.fld input::placeholder{color:rgba(255,255,255,.15);}
+.fld select option{background:#111;}
+
+.chips{display:flex;gap:.35rem;flex-wrap:wrap;}
+.chip{
+  padding:.3rem .7rem;border:1px solid rgba(255,255,255,.1);
+  font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(255,255,255,.4);cursor:pointer;transition:all .18s;user-select:none;
+}
+.chip:hover{border-color:rgba(196,0,31,.5);color:rgba(255,255,255,.8);}
+.chip.on{background:var(--R);border-color:var(--R);color:var(--W);}
+
+/* CTA */
+.btn-primary{
+  width:100%;padding:.9rem;background:var(--R);border:none;
+  color:var(--W);font-family:var(--S);font-size:.63rem;font-weight:500;
+  letter-spacing:.28em;text-transform:uppercase;cursor:pointer;
+  transition:background .25s;display:flex;align-items:center;
+  justify-content:space-between;margin-top:.5rem;
+}
+.btn-primary:hover{background:var(--R2);}
+.btn-primary svg{width:.9rem;height:.9rem;transition:transform .25s;}
+.btn-primary:hover svg{transform:translateX(4px);}
+
+.fs-note{font-size:.52rem;color:rgba(255,255,255,.2);text-align:center;margin-top:.7rem;letter-spacing:.06em;}
+
+/* ══ SCROLL INDICATOR ═══════════════ */
+.scroll-ind{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+  z-index:50;display:flex;flex-direction:column;align-items:center;gap:.5rem;
+}
+.scroll-line{width:1px;height:3rem;background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.3));animation:scrl 2s ease-in-out infinite;}
+.scroll-t{font-size:.5rem;letter-spacing:.25em;text-transform:uppercase;color:rgba(255,255,255,.25);}
+@keyframes scrl{0%,100%{opacity:.3;transform:translateY(-4px);}50%{opacity:.9;transform:translateY(4px);}}
+
+/* ══ BELOW HERO ═══════════════════
+   Section 2: "Pourquoi candidater" avec
+   bandes de photos HORIZONTALES
+═══════════════════════════════════ */
+.strip-section{background:var(--B);padding:6rem 0 0;overflow:hidden;}
+.strip-inner{max-width:1400px;margin:0 auto;padding:0 3rem;margin-bottom:4rem;}
+
+.eyebrow-lt{font-size:.6rem;font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:var(--R);margin-bottom:1rem;display:flex;align-items:center;gap:.7rem;}
+.eyebrow-lt::before{content:'';width:2rem;height:1px;background:var(--R);}
+.big{font-family:var(--F);font-size:clamp(2.2rem,4vw,4rem);font-weight:700;line-height:1.0;color:var(--W);}
+.big em{font-style:italic;color:var(--R);}
+
+/* Horizontal photo strip — images défilent horizontalement */
+.hstrip{
+  display:flex;gap:4px;overflow:hidden;
+  height:35vw;max-height:450px;margin-top:4rem;
+  position:relative;
+}
+.hstrip-annotation{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:2;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.5);white-space:nowrap;pointer-events:none;
+  background:rgba(0,0,0,.5);padding:.4rem 1rem;
+}
+.hstrip-item{flex:1;background-size:cover;background-position:center;position:relative;overflow:hidden;transition:flex .5s cubic-bezier(.4,0,.2,1);}
+.hstrip-item:hover{flex:3;}
+.hs1{background-image:url('https://picsum.photos/seed/strip1/600/900');}
+.hs2{background-image:url('https://picsum.photos/seed/strip2/600/900');}
+.hs3{background-image:url('https://picsum.photos/seed/strip3/600/900');}
+.hs4{background-image:url('https://picsum.photos/seed/strip4/600/900');}
+.hs5{background-image:url('https://picsum.photos/seed/strip5/600/900');}
+.hstrip-item::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.25);}
+
+/* ══ PROCESS ════════════════════════ */
+.process{max-width:1400px;margin:0 auto;padding:7rem 3rem;}
+.proc-row{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid rgba(255,255,255,.08);}
+.pr{padding:2.5rem;border-right:1px solid rgba(255,255,255,.08);transition:background .3s;}
+.pr:last-child{border-right:none;}
+.pr:hover{background:rgba(196,0,31,.04);}
+.pr-n{font-family:var(--F);font-size:4.5rem;font-weight:900;font-style:italic;color:var(--R);opacity:.1;line-height:1;margin-bottom:1.5rem;transition:opacity .3s;}
+.pr:hover .pr-n{opacity:.25;}
+.pr-t{font-size:.68rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--W);margin-bottom:.7rem;}
+.pr-d{font-size:.82rem;font-weight:200;line-height:1.8;color:rgba(255,255,255,.5);}
+
+/* ══ WHY DARK ═══════════════════════ */
+.why{background:var(--R);padding:6rem 3rem;}
+.why-in{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;}
+.w-big{font-family:var(--F);font-size:clamp(2rem,3.5vw,3.5rem);font-weight:700;font-style:italic;line-height:1.0;color:var(--W);margin-bottom:1.2rem;}
+.w-p{font-size:.85rem;font-weight:200;line-height:1.8;color:rgba(255,255,255,.7);margin-bottom:2rem;}
+.w-btn{
+  display:inline-flex;align-items:center;gap:.8rem;
+  border:1.5px solid rgba(255,255,255,.5);color:var(--W);
+  padding:.8rem 1.8rem;font-size:.62rem;font-weight:500;
+  letter-spacing:.25em;text-transform:uppercase;cursor:pointer;
+  transition:all .25s;
+}
+.w-btn:hover{background:var(--W);color:var(--R);}
+
+.criteria{display:flex;flex-direction:column;gap:0;}
+.crit{display:flex;gap:1rem;padding:1.1rem 0;border-bottom:1px solid rgba(255,255,255,.12);}
+.crit:last-child{border-bottom:none;}
+.c-n{font-family:var(--F);font-style:italic;font-size:.82rem;color:rgba(255,255,255,.35);flex-shrink:0;min-width:2rem;}
+.c-t{font-size:.82rem;font-weight:200;line-height:1.6;color:rgba(255,255,255,.75);}
+
+/* ══ FOOTER ════════════════════════ */
+footer{background:var(--B);border-top:1px solid rgba(255,255,255,.08);padding:2rem 3rem;display:flex;align-items:center;justify-content:space-between;}
+.fl{font-family:var(--F);font-size:.95rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;}
+.fl em{color:var(--R);font-style:normal;}
+.fr{display:flex;gap:2rem;}
+.fr a{font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);transition:color .2s;}
+.fr a:hover{color:var(--R);}
+
+/* ══ ANIMATIONS ══════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:none;}}
+.hero-copy .eyebrow{animation:fadeUp .9s ease .2s both;}
+.hero-title{animation:fadeUp 1s ease .4s both;}
+.hero-sub{animation:fadeUp .9s ease .55s both;}
+.dots{animation:fadeUp .9s ease .7s both;}
+.form-strip .fs-eyebrow{animation:fadeUp .9s ease .3s both;}
+.form-strip .fs-title{animation:fadeUp .9s ease .4s both;}
+.form-strip .mini-steps{animation:fadeUp .9s ease .5s both;}
+
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);}
+.reveal.in{opacity:1;transform:none;}
+
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;}
+  .form-strip{max-height:none;border-left:none;border-top:2px solid var(--R);}
+  .proc-row,.why-in{grid-template-columns:1fr;}
+  .pr{border-right:none;border-bottom:1px solid rgba(255,255,255,.08);}
+  footer{flex-direction:column;gap:1rem;}
+  .hstrip{height:55vw;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Lumina<em>.</em></div>
+  <a href="#apply" class="nav-cta">Candidater</a>
+</nav>
+
+<!-- ══ HERO IMMERSIF ══════════════════ -->
+<section class="hero" id="apply">
+  <div class="bg-reel" id="bgReel">
+    <div class="bg-slide b1 active"></div>
+    <div class="bg-slide b2"></div>
+    <div class="bg-slide b3"></div>
+    <div class="bg-slide b4"></div>
+  </div>
+
+  <div class="hero-inner">
+    <!-- Copy gauche -->
+    <div class="hero-copy">
+      <div class="eyebrow">Casting Montréal · 2026</div>
+      <h1 class="hero-title">
+        Rejoignez<br />
+        <strong>Lumina.</strong>
+      </h1>
+      <p class="hero-sub">
+        Agence de casting photographique haut de gamme. Nous recherchons des personnalités uniques pour des projets éditoriaux et de mode au Québec.
+      </p>
+      <div class="dots" id="dots">
+        <div class="dot active" onclick="goSlide(0)"></div>
+        <div class="dot" onclick="goSlide(1)"></div>
+        <div class="dot" onclick="goSlide(2)"></div>
+        <div class="dot" onclick="goSlide(3)"></div>
+      </div>
+    </div>
+
+    <!-- Formulaire droit -->
+    <div class="form-strip">
+      <div class="fs-eyebrow">Candidature</div>
+      <h2 class="fs-title">Soumettre<br />votre profil</h2>
+
+      <div style="margin-bottom:1.4rem;">
+        <div class="mini-steps" id="miniSteps">
+          <div style="flex:1;">
+            <div class="ms active"></div>
+            <div class="ms-lbl active" style="color:rgba(255,255,255,.65)">Photos</div>
+          </div>
+          <div style="flex:1;">
+            <div class="ms"></div>
+            <div class="ms-lbl">Profil</div>
+          </div>
+          <div style="flex:1;">
+            <div class="ms"></div>
+            <div class="ms-lbl">Mesures</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="upload-grid">
+        <div class="upload" onclick="this.querySelector('input').click()">
+          <div class="up-ico">↑</div>
+          <div class="up-t">Visage</div>
+          <div class="up-s">JPG / HEIC</div>
+          <input type="file" hidden accept="image/*"/>
+        </div>
+        <div class="upload" onclick="this.querySelector('input').click()">
+          <div class="up-ico">↑</div>
+          <div class="up-t">Full body</div>
+          <div class="up-s">Corps entier</div>
+          <input type="file" hidden accept="image/*"/>
+        </div>
+      </div>
+
+      <div class="fields">
+        <div class="frow">
+          <div class="fld"><label>Prénom <span class="r">*</span></label><input type="text" placeholder="Sophie"/></div>
+          <div class="fld"><label>Nom <span class="r">*</span></label><input type="text" placeholder="Martin"/></div>
+        </div>
+        <div class="fld"><label>Email <span class="r">*</span></label><input type="email" placeholder="sophie@exemple.com"/></div>
+        <div class="frow">
+          <div class="fld"><label>Tél <span class="r">*</span></label><input type="tel" placeholder="+1 514…"/></div>
+          <div class="fld"><label>Taille cm <span class="r">*</span></label><input type="number" placeholder="175"/></div>
+        </div>
+        <div class="fld">
+          <label>Genre <span class="r">*</span></label>
+          <div class="chips">
+            <div class="chip on" onclick="chip(this)">Femme</div>
+            <div class="chip" onclick="chip(this)">Homme</div>
+            <div class="chip" onclick="chip(this)">Non-binaire</div>
+          </div>
+        </div>
+        <div class="fld">
+          <label>Expérience <span class="r">*</span></label>
+          <select><option>Sélectionner…</option><option>Débutant(e)</option><option>Quelques shootings</option><option>Confirmé(e)</option></select>
+        </div>
+      </div>
+
+      <button class="btn-primary">
+        <span>Suivant — Mensurations</span>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+      <p class="fs-note">Données confidentielles · Jamais partagées</p>
+    </div>
+  </div>
+
+  <div class="scroll-ind">
+    <div class="scroll-line"></div>
+    <div class="scroll-t">Défiler</div>
+  </div>
+
+  <div class="photo-credit">Photos : remplacer avec vos vrais shootings Lumina</div>
+</section>
+
+<!-- ══ STRIP DE PHOTOS ══════════════
+   Option visuelle : photos défilent
+   horizontalement en bandes
+══════════════════════════════════ -->
+<section class="strip-section">
+  <div class="strip-inner">
+    <div class="eyebrow-lt reveal">Notre univers</div>
+    <h2 class="big reveal" style="transition-delay:.1s">Ce que nous<br /><em>créons ensemble</em></h2>
+  </div>
+  <div class="hstrip reveal" style="transition-delay:.2s">
+    <div class="hstrip-annotation">← Survole chaque photo pour l'agrandir</div>
+    <div class="hstrip-item hs1"></div>
+    <div class="hstrip-item hs2"></div>
+    <div class="hstrip-item hs3"></div>
+    <div class="hstrip-item hs4"></div>
+    <div class="hstrip-item hs5"></div>
+  </div>
+</section>
+
+<!-- ══ PROCESS ════════════════════════ -->
+<section class="process">
+  <div class="proc-row">
+    <div class="pr reveal">
+      <div class="pr-n">01</div>
+      <div class="pr-t">Soumission</div>
+      <p class="pr-d">5 minutes. Deux photos, informations de base, mensurations. Simple, rapide, sans engagement.</p>
+    </div>
+    <div class="pr reveal" style="transition-delay:.1s">
+      <div class="pr-n">02</div>
+      <div class="pr-t">Évaluation</div>
+      <p class="pr-d">Notre équipe évalue chaque profil avec attention. Réponse garantie sous 5 jours ouvrables.</p>
+    </div>
+    <div class="pr reveal" style="transition-delay:.2s">
+      <div class="pr-n">03</div>
+      <div class="pr-t">Shooting test</div>
+      <p class="pr-d">Si retenu(e), shooting test rémunéré à Montréal avec nos photographes. Premier pas vers notre réseau.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WHY ════════════════════════════ -->
+<section class="why">
+  <div class="why-in">
+    <div>
+      <h2 class="w-big">Pourquoi nous<br />rejoindre ?</h2>
+      <p class="w-p">Lumina Photography est un réseau de création sérieux. Nous collaborons avec des marques émergentes, des photographes établis et des directeurs artistiques exigeants depuis 2018.</p>
+      <div class="w-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        Candidater maintenant
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" style="width:.9rem"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </div>
+    </div>
+    <div class="criteria">
+      <div class="crit"><span class="c-n">01</span><span class="c-t">Tous corps, toutes origines — diversité célébrée sans conditions.</span></div>
+      <div class="crit"><span class="c-n">02</span><span class="c-t">Aucune expérience requise. Débutants bienvenus et accompagnés.</span></div>
+      <div class="crit"><span class="c-n">03</span><span class="c-t">Shooting test rémunéré pour les profils sélectionnés.</span></div>
+      <div class="crit"><span class="c-n">04</span><span class="c-t">Accès au réseau créatif : photographes, stylistes, DA.</span></div>
+      <div class="crit"><span class="c-n">05</span><span class="c-t">Projets éditoriaux, commerciaux, campagnes mode au Québec.</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fl">Lumina<em>.</em></div>
+  <div class="fr">
+    <a href="#">Instagram</a>
+    <a href="#">Contact</a>
+    <a href="#">© 2026 Lumina Photography</a>
+  </div>
+</footer>
+
+<script>
+let cur = 0;
+const bgSlides = document.querySelectorAll('.bg-slide');
+const dotsEl = document.querySelectorAll('.dot');
+
+function goSlide(n) {
+  bgSlides[cur].classList.remove('active');
+  dotsEl[cur].classList.remove('active');
+  cur = n;
+  bgSlides[cur].classList.add('active');
+  dotsEl[cur].classList.add('active');
+}
+
+setInterval(() => goSlide((cur + 1) % bgSlides.length), 6000);
+
+function chip(el) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }), {threshold:.1});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+document.querySelectorAll('.fld input,.fld select').forEach(inp => {
+  inp.addEventListener('focus', () => inp.closest('.fld').querySelector('label').style.color = 'var(--R)');
+  inp.addEventListener('blur', () => inp.closest('.fld').querySelector('label').style.color = '');
+});
+</script>
+</body>
+</html>

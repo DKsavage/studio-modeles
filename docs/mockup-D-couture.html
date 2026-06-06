@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Lumina — D · Couture Blanche</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,200;1,300;1,400;1,600&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ╔══════════════════════════════════════════════════════════╗
+   ║  LUMINA · COUTURE BLANCHE                               ║
+   ║  DA: Loro Piana · Hermès · The Row                      ║
+   ╚══════════════════════════════════════════════════════════╝ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  /* Palette couture */
+  --paper   : #F7F3EE;        /* fond papier chaud */
+  --ivory   : #EDE8DF;        /* surfaces secondaires */
+  --white   : #FFFFFF;
+  --ink     : #0C0B09;        /* noir chaud, jamais pur */
+  --red     : #8B0020;        /* rouge profond Hermès */
+  --red-lt  : #B5002A;
+  --blush   : #EDD8D8;        /* accent rose très subtil */
+  --champagne:#C4A05A;        /* or très discret */
+  --muted   : #8A8078;
+  --border  : rgba(12,11,9,.07);
+
+  /* Typo */
+  --display : 'Cormorant Garamond','Georgia',serif;
+  --body    : 'Montserrat','Helvetica Neue',sans-serif;
+
+  /* Easing luxe */
+  --ease-out: cubic-bezier(0.16,1,0.3,1);
+  --ease-in-out: cubic-bezier(0.4,0,0.2,1);
+}
+
+html{scroll-behavior:smooth;font-size:16px;}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--body);
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;cursor:none;
+}
+
+/* ── GRAIN TEXTURE papier luxueux ─────────────────────────── */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.028;mix-blend-mode:multiply;
+}
+
+/* ── CURSEUR CUSTOM croix fine ───────────────────────────── */
+#cur{position:fixed;width:8px;height:8px;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);transition:transform .08s;}
+#cur::before,#cur::after{content:'';position:absolute;background:var(--red);}
+#cur::before{width:1px;height:8px;left:3.5px;top:0;}
+#cur::after{width:8px;height:1px;left:0;top:3.5px;}
+#cur-ring{
+  position:fixed;width:36px;height:36px;pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);border:1px solid rgba(139,0,32,.3);
+  transition:transform .18s var(--ease-out),width .3s,height .3s,border-color .3s;
+}
+body:has(a:hover,button:hover) #cur-ring{width:48px;height:48px;border-color:var(--red);}
+
+/* ── NAV ──────────────────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.8rem 3.5rem;
+  background:linear-gradient(to bottom,rgba(247,243,238,.95) 0%,rgba(247,243,238,0) 100%);
+}
+.nav-logo{
+  font-family:var(--display);font-size:.95rem;font-weight:600;
+  letter-spacing:.45em;text-transform:uppercase;color:var(--ink);text-decoration:none;
+}
+.nav-logo em{color:var(--red);font-style:normal;}
+.nav-links{display:flex;gap:3rem;align-items:center;}
+.nav-links a{
+  font-size:.58rem;font-weight:500;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;transition:color .3s;position:relative;
+}
+.nav-links a::after{
+  content:'';position:absolute;bottom:-.2rem;left:0;width:0;height:1px;
+  background:var(--red);transition:width .4s var(--ease-out);
+}
+.nav-links a:hover{color:var(--ink);}
+.nav-links a:hover::after{width:100%;}
+.nav-cta{
+  font-size:.58rem;font-weight:500;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--red);border:1px solid rgba(139,0,32,.3);padding:.5rem 1.4rem;
+  transition:all .3s;text-decoration:none;
+}
+.nav-cta:hover{background:var(--red);color:var(--white);border-color:var(--red);}
+
+/* ══════════════════════════════════════════════════════════
+   HERO: SPLIT COUTURE
+   LEFT 48% — titre monumental + formulaire
+   RIGHT 52% — photo Ken Burns pleine hauteur
+══════════════════════════════════════════════════════════ */
+.hero{
+  display:grid;grid-template-columns:48% 52%;
+  min-height:100dvh;
+  border-bottom:1px solid var(--border);
+}
+
+/* ── TEXTE VERTICAL gauche ───────────────────────────────── */
+.vert-text{
+  position:fixed;left:1.8rem;top:50%;z-index:400;
+  writing-mode:vertical-rl;transform:rotate(180deg) translateY(50%);
+  font-size:.5rem;font-weight:500;letter-spacing:.35em;text-transform:uppercase;
+  color:rgba(12,11,9,.2);user-select:none;
+}
+
+/* ── LEFT PANEL ──────────────────────────────────────────── */
+.hero-left{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:8rem 3.5rem 4rem 5rem;
+  border-right:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+
+/* Monogramme géant en fond */
+.hero-left::before{
+  content:'L';position:absolute;
+  font-family:var(--display);font-size:55vw;font-weight:600;font-style:italic;
+  color:rgba(12,11,9,.02);line-height:1;
+  right:-15%;bottom:-15%;pointer-events:none;letter-spacing:-.05em;
+  transition:none;
+}
+
+/* Ligne rouge qui grandit */
+.red-rule{
+  width:0;height:1px;background:var(--red);margin-bottom:2rem;
+  transition:width 1.4s var(--ease-out) .2s;
+}
+.red-rule.in{width:3rem;}
+
+/* Eyebrow */
+.h-eyebrow{
+  font-size:.58rem;font-weight:500;letter-spacing:.35em;text-transform:uppercase;
+  color:var(--red);margin-bottom:1.8rem;opacity:0;
+  transition:opacity .9s var(--ease-out) .3s,transform .9s var(--ease-out) .3s;
+  transform:translateY(12px);
+}
+.h-eyebrow.in{opacity:1;transform:none;}
+
+/* Titre monumental — 3 lignes avec rythme typographique couture */
+.h-title{margin-bottom:2.5rem;}
+
+.title-line{overflow:hidden;line-height:1.02;}
+.title-inner{
+  display:block;
+  font-family:var(--display);font-size:clamp(3rem,5.5vw,5.8rem);
+  line-height:1.02;letter-spacing:-.02em;color:var(--ink);font-weight:300;
+  transform:translateY(105%);
+  transition:transform 1.3s var(--ease-out);
+}
+.title-inner.italic{font-style:italic;color:var(--red);font-weight:200;}
+.title-inner.bold{font-weight:600;font-style:normal;}
+
+.title-line:nth-child(1) .title-inner{transition-delay:.3s;}
+.title-line:nth-child(2) .title-inner{transition-delay:.46s;}
+.title-line:nth-child(3) .title-inner{transition-delay:.62s;}
+
+.title-line.in .title-inner{transform:translateY(0);}
+
+/* Sous-titre */
+.h-sub{
+  font-size:.82rem;font-weight:200;line-height:1.9;color:var(--muted);
+  max-width:320px;margin-bottom:3rem;
+  opacity:0;transform:translateY(12px);
+  transition:opacity .9s var(--ease-out) .9s,transform .9s var(--ease-out) .9s;
+}
+.h-sub.in{opacity:1;transform:none;}
+
+/* ── FORMULAIRE COUTURE ────────────────────────────────────
+   Carte blanche, très aérée, inputs underline only
+──────────────────────────────────────────────────────────── */
+.form-card{
+  background:var(--white);
+  border-top:2px solid var(--red);
+  padding:2.2rem 2.2rem 1.8rem;
+  box-shadow:0 4px 40px rgba(12,11,9,.06),0 1px 8px rgba(12,11,9,.04);
+  opacity:0;transform:translateY(20px);
+  transition:opacity 1s var(--ease-out) 1.1s,transform 1s var(--ease-out) 1.1s;
+  position:relative;
+}
+.form-card.in{opacity:1;transform:none;}
+
+.fc-head{margin-bottom:1.8rem;display:flex;align-items:baseline;justify-content:space-between;}
+.fc-label{font-size:.52rem;font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:var(--red);}
+.fc-title{font-family:var(--display);font-size:1.2rem;font-weight:400;font-style:italic;color:var(--ink);}
+
+/* STEPPER minimal */
+.stepper{display:flex;gap:0;margin-bottom:1.8rem;}
+.s-step{flex:1;display:flex;flex-direction:column;gap:.4rem;position:relative;}
+.s-step::after{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;background:var(--ivory);}
+.s-step.active::after,.s-step.done::after{background:var(--red);}
+.s-num{font-size:.5rem;font-weight:500;letter-spacing:.15em;color:var(--muted);padding-top:.6rem;}
+.s-step.active .s-num{color:var(--red);}
+.s-lbl{font-size:.5rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:rgba(12,11,9,.25);}
+.s-step.active .s-lbl{color:var(--ink);}
+
+/* UPLOAD zones */
+.uploads{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1.5rem;}
+.upload{
+  background:var(--paper);border:1.5px dashed rgba(139,0,32,.18);
+  padding:1.6rem .8rem;display:flex;flex-direction:column;align-items:center;
+  gap:.45rem;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;
+}
+.upload::before{
+  content:'';position:absolute;inset:0;background:rgba(139,0,32,.04);
+  transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease-out);
+}
+.upload:hover::before{transform:scaleX(1);}
+.upload:hover{border-color:var(--red);}
+.up-ring{
+  width:2rem;height:2rem;border:1px solid rgba(139,0,32,.25);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--red);font-size:.75rem;position:relative;z-index:1;
+  transition:background .3s;
+}
+.upload:hover .up-ring{background:var(--red);color:var(--white);}
+.up-t{font-size:.58rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);position:relative;z-index:1;text-align:center;}
+.up-s{font-size:.52rem;font-weight:300;color:var(--muted);position:relative;z-index:1;text-align:center;}
+
+/* CHAMPS — underline seulement, espacement généreux */
+.fields{display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.5rem;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;}
+.fld{display:flex;flex-direction:column;gap:.3rem;}
+.fld label{font-size:.52rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:rgba(12,11,9,.35);transition:color .3s;}
+.fld:focus-within label{color:var(--red);}
+.fld .req{color:var(--red);}
+.fld input,.fld select{
+  background:transparent;border:none;border-bottom:1px solid rgba(12,11,9,.12);
+  color:var(--ink);font-family:var(--body);font-size:.85rem;font-weight:300;
+  padding:.5rem 0;outline:none;transition:border-color .3s,box-shadow .3s;
+  -webkit-appearance:none;width:100%;
+}
+.fld input:focus,.fld select:focus{
+  border-bottom-color:var(--red);
+  box-shadow:0 1px 0 var(--red);
+}
+.fld input::placeholder{color:rgba(12,11,9,.18);font-weight:300;}
+.fld select option{background:var(--white);}
+
+.chips{display:flex;gap:.35rem;flex-wrap:wrap;}
+.chip{
+  padding:.3rem .85rem;border:1px solid var(--border);background:var(--paper);
+  font-size:.52rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);cursor:pointer;transition:all .25s;user-select:none;
+}
+.chip:hover{border-color:rgba(139,0,32,.35);color:var(--red);}
+.chip.on{background:var(--red);border-color:var(--red);color:var(--white);}
+
+/* BOUTON CTA — très architectural */
+.btn{
+  width:100%;padding:.9rem 1.2rem;background:var(--ink);border:none;
+  color:var(--white);font-family:var(--body);font-size:.62rem;font-weight:500;
+  letter-spacing:.32em;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;overflow:hidden;transition:letter-spacing .3s;
+}
+.btn::before{
+  content:'';position:absolute;inset:0;background:var(--red);
+  transform:translateX(-101%);transition:transform .5s var(--ease-out);
+}
+.btn:hover::before{transform:translateX(0);}
+.btn:hover{letter-spacing:.38em;}
+.btn span,.btn svg{position:relative;z-index:1;}
+.btn svg{width:.9rem;height:.9rem;transition:transform .4s var(--ease-out);}
+.btn:hover svg{transform:translateX(5px);}
+
+.f-note{font-size:.5rem;font-weight:300;color:rgba(12,11,9,.25);text-align:center;margin-top:.8rem;letter-spacing:.06em;}
+
+/* ── RIGHT PANEL: PHOTO ──────────────────────────────────── */
+.hero-right{
+  position:relative;overflow:hidden;background:var(--ink);
+}
+
+/* container Ken Burns */
+.photo-ken{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center top;
+  animation:kenBurns 14s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@keyframes kenBurns{
+  0%  {transform:scale(1.0) translate(0%,0%);}
+  100%{transform:scale(1.08) translate(-1.5%,0.8%);}
+}
+
+/* Slides */
+.photo-slide{
+  position:absolute;inset:0;opacity:0;
+  background-size:cover;background-position:center top;
+  transition:opacity 2.2s cubic-bezier(.4,0,.2,1);
+  animation:kenBurns 14s ease-in-out infinite alternate;
+}
+.photo-slide.active{opacity:1;}
+.ph1{background-image:url('https://picsum.photos/seed/couA/900/1300');}
+.ph2{background-image:url('https://picsum.photos/seed/couB/900/1300');}
+.ph3{background-image:url('https://picsum.photos/seed/couC/900/1300');}
+.ph4{background-image:url('https://picsum.photos/seed/couD/900/1300');}
+
+/* Gradient overlay: edges sombres, centre lumineux */
+.photo-overlay{
+  position:absolute;inset:0;z-index:2;
+  background:
+    linear-gradient(to right, rgba(247,243,238,.15) 0%, transparent 15%),
+    linear-gradient(to bottom, rgba(12,11,9,.15) 0%, transparent 20%,transparent 70%, rgba(12,11,9,.55) 100%);
+}
+
+/* Numérotation slide */
+.slide-num{
+  position:absolute;bottom:2.5rem;right:3rem;z-index:10;
+  font-family:var(--display);font-size:.75rem;font-style:italic;
+  color:rgba(255,255,255,.5);letter-spacing:.1em;
+}
+.slide-num strong{color:var(--white);font-style:normal;font-weight:600;}
+
+/* Barre dots slide */
+.slide-dots{
+  position:absolute;bottom:2.5rem;left:2.5rem;z-index:10;
+  display:flex;gap:.4rem;align-items:center;
+}
+.sdot{
+  width:1.4rem;height:1.5px;background:rgba(255,255,255,.25);
+  cursor:pointer;transition:all .4s;
+}
+.sdot.active{background:var(--white);width:2.5rem;}
+
+/* ═══════════════════════════════════════════════════════════
+   STATS BAR
+═══════════════════════════════════════════════════════════ */
+.stats{border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;}
+.stats-in{width:100%;display:grid;grid-template-columns:repeat(4,1fr);}
+.stat{
+  padding:2.8rem 2.5rem;text-align:center;
+  border-right:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.stat:last-child{border-right:none;}
+.stat::before{
+  content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:0;height:2px;background:var(--red);
+  transition:width .8s var(--ease-out);
+}
+.stat.in::before{width:2rem;}
+.stat-v{
+  font-family:var(--display);font-size:2.8rem;font-weight:300;font-style:italic;
+  color:var(--ink);line-height:1;margin-bottom:.4rem;
+}
+.stat-k{font-size:.52rem;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);}
+
+/* ═══════════════════════════════════════════════════════════
+   BELOW HERO — sections
+═══════════════════════════════════════════════════════════ */
+.section{max-width:1300px;margin:0 auto;padding:8rem 3.5rem;}
+
+.eyebrow{
+  font-size:.58rem;font-weight:500;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--red);margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem;
+}
+.eyebrow::before{content:'';width:2rem;height:1px;background:var(--red);flex-shrink:0;}
+
+.section-title{
+  font-family:var(--display);font-size:clamp(2.2rem,4vw,4rem);
+  font-weight:300;font-style:italic;line-height:1.05;color:var(--ink);
+}
+.section-title em{color:var(--red);}
+.section-title strong{font-weight:600;font-style:normal;}
+
+/* Processus — 3 colonnes séparées par ligne */
+.proc-header{display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:end;margin-bottom:5rem;}
+.proc-desc{font-size:.85rem;font-weight:200;line-height:1.9;color:var(--muted);}
+
+.proc-cols{display:grid;grid-template-columns:repeat(3,1fr);position:relative;}
+.proc-cols::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;background:var(--border);
+}
+.pc{
+  padding:3rem 2.5rem 2.5rem 0;
+  border-right:1px solid var(--border);
+  position:relative;overflow:hidden;
+  transition:background .4s;
+}
+.pc:last-child{border-right:none;}
+.pc:not(:first-child){padding-left:2.5rem;padding-right:0;}
+.pc:last-child{padding-right:0;}
+.pc:hover{background:rgba(139,0,32,.02);}
+
+.pc-rule{width:0;height:2px;background:var(--red);margin-bottom:2rem;transition:width .8s var(--ease-out);}
+.pc.in .pc-rule{width:2rem;}
+
+.pc-n{
+  font-family:var(--display);font-size:4rem;font-weight:200;font-style:italic;
+  color:var(--red);opacity:.1;line-height:1;margin-bottom:1.5rem;
+  transition:opacity .3s;
+}
+.pc:hover .pc-n{opacity:.25;}
+.pc-t{font-size:.65rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--ink);margin-bottom:.8rem;}
+.pc-d{font-size:.82rem;font-weight:200;line-height:1.85;color:var(--muted);}
+
+/* ─── Section sombre "Pourquoi Lumina" ───────────────────── */
+.dark-band{
+  background:var(--ink);padding:8rem 3.5rem;
+  position:relative;overflow:hidden;
+}
+
+/* Texte fantôme géant */
+.dark-band::before{
+  content:'LUMINA';position:absolute;
+  font-family:var(--display);font-size:clamp(10rem,18vw,20rem);
+  font-weight:600;font-style:italic;color:rgba(255,255,255,.025);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  white-space:nowrap;pointer-events:none;letter-spacing:-.03em;
+}
+
+.db-inner{
+  max-width:1300px;margin:0 auto;
+  display:grid;grid-template-columns:5fr 6fr;gap:8rem;
+  align-items:center;position:relative;z-index:1;
+}
+
+.db-eyebrow{
+  font-size:.58rem;font-weight:500;letter-spacing:.32em;text-transform:uppercase;
+  color:rgba(255,255,255,.35);margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem;
+}
+.db-eyebrow::before{content:'';width:2rem;height:1px;background:var(--red);flex-shrink:0;}
+
+.db-title{
+  font-family:var(--display);font-size:clamp(2rem,3.8vw,3.8rem);
+  font-weight:300;font-style:italic;line-height:1.05;color:var(--white);
+  margin-bottom:1.5rem;
+}
+.db-title em{color:var(--red);}
+
+.db-desc{
+  font-size:.85rem;font-weight:200;line-height:1.9;
+  color:rgba(255,255,255,.45);margin-bottom:2.5rem;
+}
+
+.db-cta{
+  display:inline-flex;align-items:center;gap:1rem;
+  border:1px solid rgba(255,255,255,.2);color:var(--white);
+  padding:.85rem 2rem;font-size:.6rem;font-weight:500;
+  letter-spacing:.28em;text-transform:uppercase;cursor:pointer;
+  background:transparent;transition:all .4s;text-decoration:none;
+}
+.db-cta:hover{background:var(--red);border-color:var(--red);}
+.db-cta svg{width:.9rem;height:.9rem;transition:transform .4s var(--ease-out);}
+.db-cta:hover svg{transform:translateX(4px);}
+
+/* Critères liste */
+.crit-list{display:flex;flex-direction:column;}
+.crit{
+  display:flex;gap:1.5rem;
+  padding:1.4rem 0;border-bottom:1px solid rgba(255,255,255,.07);
+  opacity:0;transform:translateX(16px);
+  transition:opacity .8s var(--ease-out),transform .8s var(--ease-out);
+}
+.crit.in{opacity:1;transform:none;}
+.crit:nth-child(1){transition-delay:.1s;}
+.crit:nth-child(2){transition-delay:.2s;}
+.crit:nth-child(3){transition-delay:.3s;}
+.crit:nth-child(4){transition-delay:.4s;}
+.crit:nth-child(5){transition-delay:.5s;}
+.crit:last-child{border-bottom:none;}
+.c-n{
+  font-family:var(--display);font-style:italic;font-size:.78rem;font-weight:300;
+  color:rgba(255,255,255,.2);flex-shrink:0;min-width:2rem;margin-top:.1rem;
+}
+.c-t{font-size:.82rem;font-weight:200;line-height:1.65;color:rgba(255,255,255,.65);}
+
+/* ── PHOTO BANDES HORIZONTALES ────────────────────────────── */
+.photo-strip{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:3px;
+  height:min(38vw,480px);overflow:hidden;
+}
+.ps-item{
+  background-size:cover;background-position:center;
+  transition:flex .6s var(--ease-out);flex:1;
+  position:relative;overflow:hidden;cursor:pointer;
+}
+.ps-item::after{
+  content:'';position:absolute;inset:0;background:rgba(12,11,9,.35);
+  transition:background .4s;
+}
+.ps-item:hover::after{background:rgba(139,0,32,.2);}
+.ps1{background-image:url('https://picsum.photos/seed/strip1/500/700');}
+.ps2{background-image:url('https://picsum.photos/seed/strip2/500/700');}
+.ps3{background-image:url('https://picsum.photos/seed/strip3/500/700');}
+.ps4{background-image:url('https://picsum.photos/seed/strip4/500/700');}
+.ps5{background-image:url('https://picsum.photos/seed/strip5/500/700');}
+
+/* ── FOOTER ───────────────────────────────────────────────── */
+footer{
+  background:var(--ink);padding:2.5rem 3.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.f-logo{
+  font-family:var(--display);font-size:.95rem;font-weight:600;
+  letter-spacing:.4em;text-transform:uppercase;color:var(--white);
+}
+.f-logo em{color:var(--red);font-style:normal;}
+.f-links{display:flex;gap:2.5rem;}
+.f-links a{
+  font-size:.55rem;font-weight:400;letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,255,255,.3);text-decoration:none;transition:color .3s;
+}
+.f-links a:hover{color:var(--white);}
+.f-copy{font-size:.52rem;font-weight:300;letter-spacing:.15em;color:rgba(255,255,255,.2);}
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLL INDICATOR
+═══════════════════════════════════════════════════════════ */
+.scroll-indicator{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+  z-index:20;display:flex;flex-direction:column;align-items:center;gap:.6rem;
+  opacity:0;animation:fadeIn 1s ease 2s forwards;
+}
+@keyframes fadeIn{to{opacity:1;}}
+.si-line{
+  width:1px;height:3.5rem;background:var(--border);position:relative;overflow:hidden;
+}
+.si-fill{
+  position:absolute;top:-100%;width:100%;height:100%;background:var(--red);
+  animation:scrollFill 2.5s ease-in-out infinite;
+}
+@keyframes scrollFill{0%{top:-100%;}100%{top:200%;}}
+.si-text{
+  font-size:.5rem;font-weight:500;letter-spacing:.28em;text-transform:uppercase;
+  color:rgba(12,11,9,.25);white-space:nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   REVEAL UTILITIES
+═══════════════════════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out);}
+.reveal.in{opacity:1;transform:none;}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════════ */
+@media(max-width:960px){
+  .hero{grid-template-columns:1fr;}
+  .hero-right{min-height:70vw;}
+  .hero-left{padding:6rem 1.5rem 3rem;}
+  .proc-header,.proc-cols,.db-inner{grid-template-columns:1fr;gap:2rem;}
+  .pc{border-right:none;border-bottom:1px solid var(--border);padding:2rem 0;}
+  .stats-in{grid-template-columns:repeat(2,1fr);}
+  .photo-strip{grid-template-columns:repeat(3,1fr);}
+  footer{flex-direction:column;gap:1.5rem;text-align:center;}
+  nav{padding:1.4rem 1.5rem;}
+  .nav-links{display:none;}
+  .vert-text{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<span class="vert-text">Lumina Photography · Casting 2026</span>
+
+<nav>
+  <a href="#" class="nav-logo">Lumina<em>.</em></a>
+  <div class="nav-links">
+    <a href="#process">Processus</a>
+    <a href="#why">L'agence</a>
+    <a href="#apply" class="nav-cta">Candidater</a>
+  </div>
+</nav>
+
+<!-- ╔══════════ HERO ══════════════════╗ -->
+<section class="hero" id="apply" style="position:relative;">
+
+  <!-- LEFT: Titre + Formulaire -->
+  <div class="hero-left">
+    <div class="red-rule"></div>
+    <div class="h-eyebrow">Casting Montréal · Ouvert 2026</div>
+
+    <div class="h-title">
+      <div class="title-line"><span class="title-inner">Devenez</span></div>
+      <div class="title-line"><span class="title-inner italic">notre</span></div>
+      <div class="title-line"><span class="title-inner bold">prochaine<em style="color:var(--red)">.</em></span></div>
+    </div>
+
+    <p class="h-sub">
+      Agence de casting photographique à Montréal. Shootings éditoriaux, commerciaux, campagnes de mode. Tous profils. Réponse garantie.
+    </p>
+
+    <!-- Formulaire couture -->
+    <div class="form-card">
+      <div class="fc-head">
+        <span class="fc-label">Candidature — Étape 1/3</span>
+        <span class="fc-title">Photos & Profil</span>
+      </div>
+
+      <div class="stepper">
+        <div class="s-step active">
+          <span class="s-num">01</span>
+          <span class="s-lbl">Photos</span>
+        </div>
+        <div class="s-step">
+          <span class="s-num">02</span>
+          <span class="s-lbl">Profil</span>
+        </div>
+        <div class="s-step">
+          <span class="s-num">03</span>
+          <span class="s-lbl">Mesures</span>
+        </div>
+      </div>
+
+      <div class="uploads">
+        <div class="upload" onclick="this.querySelector('input').click()">
+          <div class="up-ring">↑</div>
+          <div class="up-t">Visage</div>
+          <div class="up-s">Portrait clair</div>
+          <input type="file" hidden accept="image/*"/>
+        </div>
+        <div class="upload" onclick="this.querySelector('input').click()">
+          <div class="up-ring">↑</div>
+          <div class="up-t">Full body</div>
+          <div class="up-s">Corps entier</div>
+          <input type="file" hidden accept="image/*"/>
+        </div>
+      </div>
+
+      <div class="fields">
+        <div class="frow">
+          <div class="fld"><label>Prénom <span class="req">*</span></label><input type="text" placeholder="Sophie"/></div>
+          <div class="fld"><label>Nom <span class="req">*</span></label><input type="text" placeholder="Martin"/></div>
+        </div>
+        <div class="fld"><label>Email <span class="req">*</span></label><input type="email" placeholder="sophie@exemple.com"/></div>
+        <div class="frow">
+          <div class="fld"><label>Téléphone <span class="req">*</span></label><input type="tel" placeholder="+1 514 …"/></div>
+          <div class="fld"><label>Taille cm <span class="req">*</span></label><input type="number" placeholder="175"/></div>
+        </div>
+        <div class="fld">
+          <label>Genre <span class="req">*</span></label>
+          <div class="chips">
+            <div class="chip on" onclick="chip(this)">Femme</div>
+            <div class="chip" onclick="chip(this)">Homme</div>
+            <div class="chip" onclick="chip(this)">Non-binaire</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn">
+        <span>Continuer — Mensurations</span>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </button>
+      <p class="f-note">Confidentialité garantie · Aucun partage tiers</p>
+    </div>
+  </div>
+
+  <!-- RIGHT: Photos Ken Burns -->
+  <div class="hero-right">
+    <div class="photo-slide ph1 active"></div>
+    <div class="photo-slide ph2"></div>
+    <div class="photo-slide ph3"></div>
+    <div class="photo-slide ph4"></div>
+    <div class="photo-overlay"></div>
+
+    <div class="slide-dots" id="sdots">
+      <div class="sdot active" onclick="goSlide(0)"></div>
+      <div class="sdot" onclick="goSlide(1)"></div>
+      <div class="sdot" onclick="goSlide(2)"></div>
+      <div class="sdot" onclick="goSlide(3)"></div>
+    </div>
+    <div class="slide-num"><strong id="sn">1</strong> / 4</div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="si-line"><div class="si-fill"></div></div>
+    <span class="si-text">Défiler</span>
+  </div>
+</section>
+
+<!-- ╔══════════ STATS ══════════════════╗ -->
+<div class="stats">
+  <div class="stats-in">
+    <div class="stat reveal"><div class="stat-v" data-count="200">0</div><div class="stat-k">Modèles actifs</div></div>
+    <div class="stat reveal" style="transition-delay:.1s"><div class="stat-v" data-count="50">0</div><div class="stat-k">Shootings / an</div></div>
+    <div class="stat reveal" style="transition-delay:.2s"><div class="stat-v" data-count="8">0</div><div class="stat-k">Années d'expérience</div></div>
+    <div class="stat reveal" style="transition-delay:.3s"><div class="stat-v">MTL</div><div class="stat-k">Montréal, Québec</div></div>
+  </div>
+</div>
+
+<!-- ╔══════════ PROCESSUS ══════════════╗ -->
+<section class="section" id="process">
+  <div class="proc-header">
+    <div>
+      <div class="eyebrow reveal">Comment ça fonctionne</div>
+      <h2 class="section-title reveal" style="transition-delay:.1s">Un processus<br /><em>transparent</em></h2>
+    </div>
+    <p class="proc-desc reveal" style="transition-delay:.2s">
+      De la soumission à la convocation, chaque étape est conçue pour être simple, rapide et respectueuse. Nous répondons à chaque candidature sans exception.
+    </p>
+  </div>
+  <div class="proc-cols">
+    <div class="pc">
+      <div class="pc-rule"></div>
+      <div class="pc-n">01</div>
+      <div class="pc-t">Soumission</div>
+      <p class="pc-d">Remplissez le formulaire en 5 minutes. Deux photos, vos informations, vos mensurations. Aucun CV, aucun historique requis.</p>
+    </div>
+    <div class="pc">
+      <div class="pc-rule"></div>
+      <div class="pc-n">02</div>
+      <div class="pc-t">Évaluation</div>
+      <p class="pc-d">Notre directrice artistique examine chaque profil personnellement. Réponse garantie sous cinq jours ouvrables par email.</p>
+    </div>
+    <div class="pc">
+      <div class="pc-rule"></div>
+      <div class="pc-n">03</div>
+      <div class="pc-t">Shooting test</div>
+      <p class="pc-d">Si retenu(e), vous êtes convoqué(e) pour un shooting test rémunéré à Montréal — premier pas dans notre réseau créatif.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ╔══════════ BANDES PHOTOS ══════════╗ -->
+<div class="photo-strip reveal">
+  <div class="ps-item ps1"></div>
+  <div class="ps-item ps2"></div>
+  <div class="ps-item ps3"></div>
+  <div class="ps-item ps4"></div>
+  <div class="ps-item ps5"></div>
+</div>
+
+<!-- ╔══════════ WHY LUMINA ═════════════╗ -->
+<section class="dark-band" id="why">
+  <div class="db-inner">
+    <div>
+      <div class="db-eyebrow">Pourquoi nous rejoindre</div>
+      <h2 class="db-title reveal">Ce que nous<br /><em>vous offrons</em></h2>
+      <p class="db-desc reveal" style="transition-delay:.1s">
+        Lumina Photography est plus qu'une agence — c'est un collectif de créateurs. Depuis 2018, nous collaborons avec des marques locales exigeantes, des photographes établis et des directeurs artistiques reconnus au Québec.
+      </p>
+      <a href="#apply" class="db-cta reveal" style="transition-delay:.2s">
+        Candidater maintenant
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+    </div>
+    <div class="crit-list">
+      <div class="crit"><span class="c-n">01</span><span class="c-t">Tous les types de corps bienvenus — nous célébrons la diversité sans réserve.</span></div>
+      <div class="crit"><span class="c-n">02</span><span class="c-t">Aucune expérience requise — nous accompagnons les débutant(e)s avec soin.</span></div>
+      <div class="crit"><span class="c-n">03</span><span class="c-t">Shooting test rémunéré pour chaque profil retenu.</span></div>
+      <div class="crit"><span class="c-n">04</span><span class="c-t">Accès à notre réseau : photographes, stylistes, directeurs artistiques.</span></div>
+      <div class="crit"><span class="c-n">05</span><span class="c-t">Projets éditoriaux, commerciaux et campagnes de mode au Québec.</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="f-logo">Lumina<em>.</em></div>
+  <div class="f-links">
+    <a href="#">Instagram</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="f-copy">© 2026 Lumina Photography · Montréal</div>
+</footer>
+
+<script>
+/* Curseur */
+const cur = document.getElementById('cur');
+const curRing = document.getElementById('cur-ring');
+let mx=0, my=0, rx=0, ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; });
+function animRing(){
+  rx += (mx-rx) * 0.12;
+  ry += (my-ry) * 0.12;
+  curRing.style.left=rx+'px'; curRing.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+/* Slideshow Ken Burns */
+const slides=document.querySelectorAll('.photo-slide');
+const sdots=document.querySelectorAll('.sdot');
+const snEl=document.getElementById('sn');
+let cur2=0;
+function goSlide(n){
+  slides[cur2].classList.remove('active');
+  sdots[cur2].classList.remove('active');
+  cur2=n;
+  slides[cur2].classList.add('active');
+  sdots[cur2].classList.add('active');
+  snEl.textContent=cur2+1;
+}
+setInterval(()=>goSlide((cur2+1)%slides.length),6500);
+
+/* Chips */
+function chip(el){
+  el.closest('.chips').querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+/* Count-up */
+function countUp(el, end, dur){
+  const start=performance.now();
+  function tick(now){
+    const p=Math.min((now-start)/dur,1);
+    const ease=1-Math.pow(1-p,4);
+    el.textContent=Math.round(ease*end)+(end>=100?'+':'');
+    if(p<1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+/* Intersection Observer */
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting) return;
+    e.target.classList.add('in');
+    /* stat count-up */
+    const v=e.target.querySelector('[data-count]');
+    if(v) countUp(v,parseInt(v.dataset.count),1800);
+    /* process rules */
+    const rule=e.target.querySelector('.pc-rule');
+    /* crits */
+    const crits=e.target.querySelectorAll('.crit');
+    crits.forEach(c=>c.classList.add('in'));
+  });
+},{threshold:0.12});
+
+document.querySelectorAll('.reveal,.stat,.pc').forEach(el=>obs.observe(el));
+
+/* Hero text reveal on load */
+window.addEventListener('DOMContentLoaded',()=>{
+  document.querySelector('.red-rule').classList.add('in');
+  document.querySelector('.h-eyebrow').classList.add('in');
+  document.querySelectorAll('.title-line').forEach(l=>l.classList.add('in'));
+  setTimeout(()=>{
+    document.querySelector('.h-sub').classList.add('in');
+    document.querySelector('.form-card').classList.add('in');
+  },200);
+});
+</script>
+</body>
+</html>

@@ -55,6 +55,8 @@ Site d'inscription mannequins pour **Lumina Photography** (agence de casting Mon
 
 ## Stack technique
 
+### Stack actuelle (HTML vanilla — legacy)
+
 | Couche | Outil |
 | --- | --- |
 | Frontend | HTML/CSS vanilla + Tailwind CSS v3 |
@@ -66,6 +68,22 @@ Site d'inscription mannequins pour **Lumina Photography** (agence de casting Mon
 | Auth | Supabase Auth — email + OTP 8 chiffres |
 | Emails | Resend — `casting@luminamodels.ca` |
 | Ancienne stack | ~~Google Apps Script + Sheets + Drive~~ → complètement remplacée |
+
+### Stack cible — Phase 7 (migration Next.js)
+
+| Couche | Outil |
+| --- | --- |
+| Framework | Next.js 15 (App Router) |
+| Langage | TypeScript strict |
+| Styles | Tailwind CSS v4 |
+| Composants UI | shadcn/ui (MCP configuré dans `.mcp.json`) |
+| Animations | Framer Motion — Ken Burns, clip-path reveals, count-up |
+| Images | `next/image` avec `fill` + `priority` sur le hero |
+| Backend | Route Handlers Next.js (`app/api/`) |
+| Base de données | Supabase PostgreSQL (inchangé) |
+| Auth | Supabase Auth OTP 8 chiffres (inchangé) |
+| Emails | Resend (inchangé) |
+| Hosting | Vercel (inchangé) |
 
 ---
 
@@ -136,10 +154,79 @@ Identifiants fixes :
 - ✅ Envoi convocations : `send-session.js` → Resend, template HTML bilingue, auth JWT vérifiée
 - ✅ Corrections dashboard : carte status verte, date picker, adresse unique, notifier email
 
-### Ce qui reste (Phase 7)
+### Phase 7 — Migration Next.js + TypeScript + Design Couture (en cours)
 
-- ⏳ Domaine custom (`luminamodels.ca` ou similaire)
-- ⏳ Refonte design CSS plus poussée (demander moodboard avant de commencer)
+**Décision (juin 2026) :** Migration complète vers Next.js 15 / TypeScript / Tailwind v4 / shadcn.
+Maquette de référence : **`docs/mockup-D-couture.html`** — "Couture Blanche".
+
+#### Direction artistique validée — Mockup D "Couture Blanche"
+
+| Élément | Valeur |
+| --- | --- |
+| DA | Loro Piana · Hermès · The Row — luxe éditorial |
+| Fond | `#F7F3EE` papier chaud (grain SVG) |
+| Rouge | `#8B0020` profond |
+| Blush | `#EDD8D8` surfaces secondaires |
+| Champagne | `#C4A05A` micro-accents |
+| Police display | Cormorant Garamond 300 italic |
+| Police UI | Montserrat 200/300/500 |
+| Layout hero | Split 48/52 — formulaire gauche, photo Ken Burns droite |
+| Formulaire | 3 étapes, inputs underline-only, 0 border-radius |
+| Animations | Ken Burns 14s, clip-path text reveal, count-up stats, scroll reveal |
+| Curseur | Croix rouge fine (custom CSS) |
+| Grain | SVG noise 0.028 opacity sur `body::after` |
+
+#### Composants Next.js à créer
+
+```
+app/
+├── page.tsx                  → Hero split (photo + form)
+├── layout.tsx                → Font load, metadata
+├── globals.css               → Tokens CSS, grain
+├── candidature/
+│   └── [step]/page.tsx       → Étapes 2 et 3
+└── api/
+    ├── submit/route.ts       → POST candidature (port de submit.js)
+    └── ...
+
+components/
+├── hero/
+│   ├── HeroSplit.tsx         → Split 48/52
+│   ├── PhotoSlideshow.tsx    → Ken Burns + crossfade
+│   └── ScrollIndicator.tsx
+├── form/
+│   ├── CandidatureForm.tsx   → Multi-step wrapper
+│   ├── StepPhotos.tsx
+│   ├── StepProfil.tsx
+│   └── StepMensurations.tsx
+├── sections/
+│   ├── StatsBar.tsx          → Count-up animé
+│   ├── PhotoStrip.tsx        → Bandes défilantes
+│   ├── ProcessSection.tsx
+│   └── DarkSection.tsx
+└── ui/                       → shadcn components
+```
+
+#### Checklist migration
+
+- [ ] `npx create-next-app@latest` dans nouveau dossier — TypeScript, Tailwind, App Router
+- [ ] `npx shadcn@latest init -d` → config components.json
+- [ ] Porter tokens CSS de mockup-D vers `globals.css`
+- [ ] Créer `PhotoSlideshow.tsx` — Framer Motion + `next/image`
+- [ ] Porter logique `submit.js` → `app/api/submit/route.ts` (TypeScript + Zod)
+- [ ] Port auth OTP admin → `app/admin/`
+- [ ] `prefers-reduced-motion` sur Ken Burns + marquee
+- [ ] Tests TypeScript : `npx tsc --noEmit` avant chaque commit
+
+#### Points de vigilance
+
+- `next/image` obligatoire pour toutes les photos — jamais `<img>` nu
+- Ken Burns = `CSS animation` sur le container, PAS sur `next/image` directement
+- Les Vercel Functions (`api/*.js`) deviennent des **Route Handlers** (`app/api/*/route.ts`)
+- Garder `SUPABASE_SERVICE_KEY` côté serveur uniquement (jamais `NEXT_PUBLIC_`)
+- shadcn MCP configuré dans `.mcp.json` → actif quand Claude Code est ouvert depuis ce dossier
+
+- ⏳ Domaine custom (`luminamodels.ca`) — après migration
 
 ---
 
