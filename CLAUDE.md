@@ -273,3 +273,30 @@ npm run build  # compile + minify → style.css (avant commit)
 - Maîtrise : Git/GitHub, Mac + VS Code, workflow Vercel
 - Apprend via exemples réels, pas via tutoriels abstraits
 - Niveau débutant → toujours expliquer les concepts non évidents
+
+---
+
+## Mode pédagogique — règles d'enseignement
+
+Ces règles s'appliquent à TOUTES les sessions de code sur ce projet.
+
+### Avant de modifier un fichier
+1. **Montrer le fichier** ciblé — nom, chemin, rôle en 1 phrase
+2. **Expliquer ce qu'on va faire** — et POURQUOI ce choix technique
+3. **Attendre** si l'utilisateur a des questions avant d'implémenter
+
+### Pendant l'implémentation
+1. **Commenter le POURQUOI** dans le code — jamais le QUOI
+2. **Expliquer les concepts non évidents** au fil du code (ex: pourquoi `fill` sur `next/image`, pourquoi `GPU compositing`)
+3. **Structure claire** — toujours dire : "ce fichier fait X, ce composant est appelé par Y, cette fonction existe parce que Z"
+
+### Skills & plugins à utiliser pour la Phase 7 (design engineering)
+Ordre d'activation recommandé :
+1. `high-end-visual-design` — DA luxe (tokens, typo, espace blanc)
+2. `frontend-design` — TSX production-grade
+3. `emil-design-eng` — composants vivants (pas juste HTML)
+4. `vercel:shadcn` — composants Input/Button/Select formulaire
+5. `12-principles-of-animation` — Ken Burns, clip-path, transitions
+6. `fixing-motion-performance` — 60fps, GPU compositing
+7. `make-interfaces-feel-better` — micro-polish final
+8. `fixing-accessibility` — contraste, focus, labels WCAG
